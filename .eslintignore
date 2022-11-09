@@ -1,0 +1,10 @@
+build/*.js
+src/assets
+src/mock
+src/mock.js
+public
+static
+dist
+plopfile.js
+mock
+vue.config.js
