@@ -12,14 +12,14 @@ import Topbar from './Wap/Topbar'
 import Footerbar from './Wap/Footerbar'
 
 export default {
+  components: {
+    Topbar,
+    Footerbar
+  },
   data () {
     return {
       dialogVisible: false
     }
-  },
-  components: {
-    Topbar,
-    Footerbar
   },
   methods: {
     handleOpen (key, keyPath) {

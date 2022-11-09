@@ -4,16 +4,16 @@
       <el-breadcrumb class="breadcrumb" separator="/">
         <el-breadcrumb-item :to="{ name: 'dashboard' }">首页</el-breadcrumb-item>
         <el-breadcrumb-item>数据管理</el-breadcrumb-item>
-        <el-breadcrumb-item>{{infoForm.id ? '编辑热门搜索' : '添加热门搜索'}}</el-breadcrumb-item>
+        <el-breadcrumb-item>{{ infoForm.id ? '编辑热门搜索' : '添加热门搜索' }}</el-breadcrumb-item>
       </el-breadcrumb>
       <div class="operation-nav">
-        <el-button type="primary" @click="goBackPage" icon="arrow-left">返回列表</el-button>
+        <el-button type="primary" icon="arrow-left" @click="goBackPage">返回列表</el-button>
       </div>
     </div>
     <div class="content-main">
       <div class="form-table-box">
-        <el-form ref="infoForm" :rules="infoRules" :model="infoForm" label-width="120px">
-          
+        <el-form ref="infoForm" :rules="infoRules" :model="infoForm" labelWidth="120px">
+
           <el-form-item label="商品ID" prop="id">
             <el-input v-model="infoForm.id"></el-input>
           </el-form-item>
@@ -34,73 +34,73 @@
 </template>
 
 <script>
-  import api from '@/config/api';
-  
-  export default {
-    data() {
-      return {
-        infoForm: {
-          id: 0,
-          keyword: '',
-        },
-        infoRules: {
-          keyword: [
-            { required: true, message: '请输入关键词', trigger: 'blur' },
-          ],
-        },
-      }
+import api from '@/config/api'
+
+export default {
+  components: {
+  },
+  data() {
+    return {
+      infoForm: {
+        id: 0,
+        keyword: '',
+      },
+      infoRules: {
+        keyword: [
+          { required: true, message: '请输入关键词', trigger: 'blur' },
+        ],
+      },
+    }
+  },
+  mounted() {
+    this.infoForm.id = this.$route.query.id || 0
+    this.getInfo()
+    console.log(api)
+  },
+  methods: {
+    goBackPage() {
+      this.$router.go(-1)
     },
-    methods: {
-      goBackPage() {
-        this.$router.go(-1);
-      },
-      onSubmitInfo() {
-        this.$refs['infoForm'].validate((valid) => {
-          if (valid) {
-            this.axios.post('keywords/store', this.infoForm).then((response) => {
-              if (response.data.errno === 0) {
-                this.$message({
-                  type: 'success',
-                  message: '保存成功'
-                });
-                this.$router.go(-1)
-              } else {
-                this.$message({
-                  type: 'error',
-                  message: '保存失败'
-                })
-              }
-            })
-          } else {
-            return false;
-          }
-        });
-      },
-      getInfo() {
-        if (this.infoForm.id <= 0) {
+    onSubmitInfo() {
+      this.$refs['infoForm'].validate((valid) => {
+        if (valid) {
+          this.axios.post('keywords/store', this.infoForm).then((response) => {
+            if (response.data.errno === 0) {
+              this.$message({
+                type: 'success',
+                message: '保存成功'
+              })
+              this.$router.go(-1)
+            } else {
+              this.$message({
+                type: 'error',
+                message: '保存失败'
+              })
+            }
+          })
+        } else {
           return false
         }
-
-        //加载热门搜索详情
-        let that = this
-        this.axios.get('keywords/info', {
-          params: {
-            id: that.infoForm.id
-          }
-        }).then((response) => {
-          let resInfo = response.data.data;
-          that.infoForm = resInfo;
-        })
+      })
+    },
+    getInfo() {
+      if (this.infoForm.id <= 0) {
+        return false
       }
 
-    },
-    components: {
-    },
-    mounted() {
-      this.infoForm.id = this.$route.query.id || 0;
-      this.getInfo();
-      console.log(api)
+      //加载热门搜索详情
+      let that = this
+      this.axios.get('keywords/info', {
+        params: {
+          id: that.infoForm.id
+        }
+      }).then((response) => {
+        let resInfo = response.data.data
+        that.infoForm = resInfo
+      })
     }
+
   }
+}
 
 </script>

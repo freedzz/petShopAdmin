@@ -1,14 +1,14 @@
 <template>
   <div class="login">
     <div class="login-box">
-      <div class="logo"><img src="@/assets/img/loading2.gif" /></div>
+      <div class="logo"><img src="@/assets/img/loading2.gif"></div>
       <div class="body">
         <p class="tips">海风小店</p>
-        <el-form ref="form" :model="form" :rules="rules" label-position="top">
+        <el-form ref="form" :model="form" :rules="rules" labelPosition="top">
           <el-form-item label="" prop="username"><el-input v-model="form.username" placeholder="用户名"></el-input></el-form-item>
-          <el-form-item label="" prop="password"><el-input type="password" v-model="form.password" placeholder="密码"></el-input></el-form-item>
+          <el-form-item label="" prop="password"><el-input v-model="form.password" type="password" placeholder="密码"></el-input></el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="startLogin" :loading="loading" style="width: 100%;">{{ loading ? '登录中...' : '登录' }}</el-button>
+            <el-button type="primary" :loading="loading" style="width: 100%;" @click="startLogin">{{ loading ? '登录中...' : '登录' }}</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -16,11 +16,11 @@
   </div>
 </template>
 <script>
-import api from '@/config/api'
 import { login } from '@/api/login/login'
 
 export default {
-  data () {
+  components: {},
+  data() {
     return {
       form: {
         username: '',
@@ -33,9 +33,8 @@ export default {
       loading: false
     }
   },
-  components: {},
   methods: {
-    startLogin () {
+    startLogin() {
       this.$refs.form.validate(async valid => {
         if (!valid) {
           return false
@@ -52,7 +51,7 @@ export default {
 
           this.$router.push({ name: 'welcome' })
           const sUserAgent = navigator.userAgent
-          // todo 手机端
+          // 手机端
           const mobileAgents = ['Android', 'iPhone', 'Symbian', 'WindowsPhone', 'iPod', 'BlackBerry', 'Windows CE']
           let goUrl = 0
           for (var i = 0; i < mobileAgents.length; i++) {
@@ -73,8 +72,7 @@ export default {
         }
       })
     }
-  },
-  mounted () {}
+  }
 }
 </script>
 <style>

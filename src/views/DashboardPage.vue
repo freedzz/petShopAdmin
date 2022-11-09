@@ -12,12 +12,12 @@ import Sidebar from './Common/Sidebar'
 // import Navbar from './Common/Navbar'
 
 export default {
-  data () {
-    return {}
-  },
   components: {
     Sidebar
     // Navbar
+  },
+  data () {
+    return {}
   },
   methods: {
     handleOpen (key, keyPath) {

@@ -16,22 +16,22 @@
             <template slot-scope="scope">
               <div v-if="scope.row.level == 1" class="bg-gray">{{ scope.row.name }}</div>
               <div v-if="scope.row.level == 2" class="bg-left">{{ scope.row.name }}</div>
-              <!-- {{ scope.row.level == 2 ? '　' : '' }} {{scope.row.name}} -->
+              <!-- {{ scope.row.level == 2 ? '' : '' }} {{scope.row.name}} -->
             </template>
           </el-table-column>
           <el-table-column label="图标显示" width="80">
             <template slot-scope="scope">
-              <el-switch v-model="scope.row.is_channel" active-text="" inactive-text="" @change="changeChannelStatus($event, scope.row.id)"></el-switch>
+              <el-switch v-model="scope.row.is_channel" activeText="" inactiveText="" @change="changeChannelStatus($event, scope.row.id)"></el-switch>
             </template>
           </el-table-column>
           <el-table-column label="首页显示" width="80">
             <template slot-scope="scope">
-              <el-switch v-model="scope.row.is_show" active-text="" inactive-text="" @change="changeShowStatus($event, scope.row.id)"></el-switch>
+              <el-switch v-model="scope.row.is_show" activeText="" inactiveText="" @change="changeShowStatus($event, scope.row.id)"></el-switch>
             </template>
           </el-table-column>
           <el-table-column label="全部产品页面显示" width="140">
             <template slot-scope="scope">
-              <el-switch v-model="scope.row.is_category" active-text="" inactive-text="" @change="changeCategoryStatus($event, scope.row.id)"></el-switch>
+              <el-switch v-model="scope.row.is_category" activeText="" inactiveText="" @change="changeCategoryStatus($event, scope.row.id)"></el-switch>
             </template>
           </el-table-column>
 
@@ -55,7 +55,8 @@
 
 <script>
 export default {
-  data () {
+  components: {},
+  data() {
     return {
       page: 1,
       total: 0,
@@ -65,8 +66,11 @@ export default {
       tableData: []
     }
   },
+  mounted() {
+    this.getList()
+  },
   methods: {
-    changeShowStatus ($event, para) {
+    changeShowStatus($event, para) {
       this.axios
         .get('category/showStatus', {
           params: {
@@ -74,9 +78,11 @@ export default {
             id: para
           }
         })
-        .then(response => {})
+        .then(response => {
+          console.log(response)
+        })
     },
-    changeChannelStatus ($event, para) {
+    changeChannelStatus($event, para) {
       this.axios
         .get('category/channelStatus', {
           params: {
@@ -84,9 +90,11 @@ export default {
             id: para
           }
         })
-        .then(response => {})
+        .then(response => {
+          console.log(response)
+        })
     },
-    changeCategoryStatus ($event, para) {
+    changeCategoryStatus($event, para) {
       this.axios
         .get('category/categoryStatus', {
           params: {
@@ -94,15 +102,17 @@ export default {
             id: para
           }
         })
-        .then(response => {})
+        .then(response => {
+          console.log(response)
+        })
     },
-    submitSort (index, row) {
-      this.axios.post('category/updateSort', { id: row.id, sort: row.sort_order }).then(response => {})
+    submitSort(index, row) {
+      this.axios.post('category/updateSort', { id: row.id, sort: row.sort_order })
     },
-    handleRowEdit (index, row) {
+    handleRowEdit(index, row) {
       this.$router.push({ name: 'category_add', query: { id: row.id } })
     },
-    handleRowDelete (index, row) {
+    handleRowDelete(index, row) {
       this.$confirm('确定要删除?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -126,11 +136,11 @@ export default {
         })
       })
     },
-    onSubmitFilter () {
+    onSubmitFilter() {
       this.page = 1
       this.getList()
     },
-    getList () {
+    getList() {
       this.axios
         .get('category', {
           params: {
@@ -142,10 +152,6 @@ export default {
           this.tableData = response.data.data
         })
     }
-  },
-  components: {},
-  mounted () {
-    this.getList()
   }
 }
 </script>

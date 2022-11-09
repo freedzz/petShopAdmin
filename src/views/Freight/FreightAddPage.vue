@@ -6,13 +6,13 @@
         <el-breadcrumb-item>{{ infoForm.id ? '编辑模板' : '添加模板' }}</el-breadcrumb-item>
       </el-breadcrumb>
       <div class="operation-nav">
-        <el-button type="primary" @click="goBackPage" icon="arrow-left">返回列表</el-button>
+        <el-button type="primary" icon="arrow-left" @click="goBackPage">返回列表</el-button>
         <!--<el-button type="primary" @click="test" icon="arrow-left">测试</el-button>-->
       </div>
     </div>
     <div class="content-main">
       <div class="form-table-box">
-        <el-form ref="infoForm" :rules="infoRules" :model="infoForm" label-width="120px">
+        <el-form ref="infoForm" :rules="infoRules" :model="infoForm" labelWidth="120px">
           <el-form-item label="模板名字" prop="name"><el-input v-model="infoForm.name" placeholder="请输入模板名称" autofocus></el-input></el-form-item>
           <el-form-item label="包装费用"><el-input v-model="infoForm.package_price"></el-input></el-form-item>
           <el-form-item label="快递收费方式">
@@ -44,22 +44,28 @@
               <el-table :data="defaultData" style="width: 100%" border stripe>
                 <el-table-column prop="start" :label="infoForm.freight_type == 0 ? '首件(个)' : '首重(KG)'">
                   <template slot-scope="scope">
-                    <el-input size="mini" v-model="scope.row.start" placeholder="个" @blur="submitValue(scope.$index, scope.row.start)" autofocus></el-input>
+                    <el-input
+                      v-model="scope.row.start"
+                      size="mini"
+                      placeholder="个"
+                      autofocus
+                      @blur="submitValue(scope.$index, scope.row.start)"
+                    ></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column prop="start_fee" label="运费(元)">
                   <template slot-scope="scope">
-                    <el-input size="mini" v-model="scope.row.start_fee" placeholder="运费" @blur="submitValue(scope.$index, scope.row.start_fee)"></el-input>
+                    <el-input v-model="scope.row.start_fee" size="mini" placeholder="运费" @blur="submitValue(scope.$index, scope.row.start_fee)"></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column prop="add" :label="infoForm.freight_type == 0 ? '续件(个)' : '续重(KG)'">
                   <template slot-scope="scope">
-                    <el-input size="mini" v-model="scope.row.add" placeholder="个" @blur="submitValue(scope.$index, scope.row.add)"></el-input>
+                    <el-input v-model="scope.row.add" size="mini" placeholder="个" @blur="submitValue(scope.$index, scope.row.add)"></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column prop="add_fee" label="运费(元)">
                   <template slot-scope="scope">
-                    <el-input size="mini" v-model="scope.row.add_fee" placeholder="运费" @blur="submitValue(scope.$index, scope.row.add_fee)"></el-input>
+                    <el-input v-model="scope.row.add_fee" size="mini" placeholder="运费" @blur="submitValue(scope.$index, scope.row.add_fee)"></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column prop="free_by_number" label="按件包邮" width="140">
@@ -67,17 +73,17 @@
                     <el-switch
                       v-if="scope.row.free_by_number == 0"
                       v-model="scope.row.freeByNumber"
-                      active-color="#13ce66"
+                      activeColor="#13ce66"
                       @change="changeDefaultNumberSwitch(scope.$index, scope.row)"
                     ></el-switch>
                     <el-input-number
                       v-if="scope.row.free_by_number > 0"
+                      v-model="scope.row.free_by_number"
                       class="number_input"
                       :min="0"
                       :max="99999"
-                      controls-position="right"
+                      controlsPosition="right"
                       size="mini"
-                      v-model="scope.row.free_by_number"
                       placeholder="件"
                       @blur="changeDefaultNumberInput(scope.$index, scope.row.free_by_number)"
                       @change="changeDefaultNumberInput(scope.$index, scope.row.free_by_number)"
@@ -89,17 +95,17 @@
                     <el-switch
                       v-if="scope.row.free_by_money == 0"
                       v-model="scope.row.freeByMoney"
-                      active-color="#13ce66"
+                      activeColor="#13ce66"
                       @change="changeDefaultMoneySwitch(scope.$index, scope.row)"
                     ></el-switch>
                     <el-input-number
                       v-if="scope.row.free_by_money > 0"
+                      v-model="scope.row.free_by_money"
                       class="money_input"
                       :min="0"
                       :max="99999"
-                      controls-position="right"
+                      controlsPosition="right"
                       size="mini"
-                      v-model="scope.row.free_by_money"
                       placeholder="金额"
                       @blur="changeDefaultMoneyInput(scope.$index, scope.row.free_by_money)"
                       @change="changeDefaultMoneyInput(scope.$index, scope.row.free_by_money)"
@@ -115,22 +121,28 @@
                 <el-table-column prop="areaName" label="运送到"></el-table-column>
                 <el-table-column prop="start" :label="infoForm.freight_type == 0 ? '首件(个)' : '首重(KG)'" width="90">
                   <template slot-scope="scope">
-                    <el-input size="mini" v-model="scope.row.start" placeholder="个" @blur="submitValue(scope.$index, scope.row.start)" autofocus></el-input>
+                    <el-input
+                      v-model="scope.row.start"
+                      size="mini"
+                      placeholder="个"
+                      autofocus
+                      @blur="submitValue(scope.$index, scope.row.start)"
+                    ></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column prop="start_fee" label="运费(元)" width="90">
                   <template slot-scope="scope">
-                    <el-input size="mini" v-model="scope.row.start_fee" placeholder="运费" @blur="submitValue(scope.$index, scope.row.start_fee)"></el-input>
+                    <el-input v-model="scope.row.start_fee" size="mini" placeholder="运费" @blur="submitValue(scope.$index, scope.row.start_fee)"></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column prop="add" :label="infoForm.freight_type == 0 ? '续件(个)' : '续重(KG)'" width="90">
                   <template slot-scope="scope">
-                    <el-input size="mini" v-model="scope.row.add" placeholder="个" @blur="submitValue(scope.$index, scope.row.add)"></el-input>
+                    <el-input v-model="scope.row.add" size="mini" placeholder="个" @blur="submitValue(scope.$index, scope.row.add)"></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column prop="add_fee" label="运费(元)" width="90">
                   <template slot-scope="scope">
-                    <el-input size="mini" v-model="scope.row.add_fee" placeholder="运费" @blur="submitValue(scope.$index, scope.row.add_fee)"></el-input>
+                    <el-input v-model="scope.row.add_fee" size="mini" placeholder="运费" @blur="submitValue(scope.$index, scope.row.add_fee)"></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column prop="free_by_number" label="按件包邮" width="120">
@@ -138,17 +150,17 @@
                     <el-switch
                       v-if="scope.row.free_by_number == 0"
                       v-model="scope.row.freeByNumber"
-                      active-color="#13ce66"
+                      activeColor="#13ce66"
                       @change="changeNumberSwitch(scope.$index, scope.row)"
                     ></el-switch>
                     <el-input-number
                       v-if="scope.row.free_by_number > 0"
+                      v-model="scope.row.free_by_number"
                       class="number_input"
                       :min="0"
                       :max="99999"
-                      controls-position="right"
+                      controlsPosition="right"
                       size="mini"
-                      v-model="scope.row.free_by_number"
                       placeholder="件"
                       @blur="changeNumberInput(scope.$index, scope.row.free_by_number)"
                       @change="changeNumberInput(scope.$index, scope.row.free_by_number)"
@@ -160,17 +172,17 @@
                     <el-switch
                       v-if="scope.row.free_by_money == 0"
                       v-model="scope.row.freeByMoney"
-                      active-color="#13ce66"
+                      activeColor="#13ce66"
                       @change="changeMoneySwitch(scope.$index, scope.row)"
                     ></el-switch>
                     <el-input-number
                       v-if="scope.row.free_by_money > 0"
+                      v-model="scope.row.free_by_money"
                       class="money_input"
                       :min="0"
                       :max="99999"
-                      controls-position="right"
+                      controlsPosition="right"
                       size="mini"
-                      v-model="scope.row.free_by_money"
                       placeholder="金额"
                       @blur="changeMoneyInput(scope.$index, scope.row.free_by_money)"
                       @change="changeMoneyInput(scope.$index, scope.row.free_by_money)"
@@ -180,7 +192,7 @@
                 <el-table-column label="操作" width="160">
                   <template slot-scope="scope">
                     <el-button size="mini" type="primary" plain @click="handleRowEdit(scope.$index, scope.row)">编辑地区</el-button>
-                    <el-button @click.native.prevent="deleteRow(scope.$index, tableData)" type="text" size="small">移除</el-button>
+                    <el-button type="text" size="small" @click.native.prevent="deleteRow(scope.$index, tableData)">移除</el-button>
                   </template>
                 </el-table-column>
               </el-table>
@@ -198,7 +210,7 @@
     </div>
     <el-dialog size="tiny" title="设置运送到到区域" :visible.sync="specEditVisible">
       <el-form ref="specForm" class="specFormDialig">
-        <el-form-item label="" prop="value" label-width="100px">
+        <el-form-item label="" prop="value" labelWidth="100px">
           <el-transfer v-model="selectedArea" :props="{ key: 'id', label: 'name' }" :data="areaData" :titles="['可选', '已选']"></el-transfer>
         </el-form-item>
       </el-form>
@@ -212,10 +224,11 @@
 </template>
 
 <script>
-import api from '@/config/api'
+// import api from '@/config/api'
 
 export default {
-  data () {
+  components: {},
+  data() {
     return {
       value: true,
       nowTableIndex: 0,
@@ -247,51 +260,57 @@ export default {
       ]
     }
   },
+  mounted() {
+    this.infoForm.id = this.$route.query.id || 0
+    // console.log(this.infoForm.id);
+    this.getInfo()
+    this.getAllAreaData()
+  },
   methods: {
-    changeDefaultNumberSwitch (index, row) {
-      if (row.freeByNumber == true) {
+    changeDefaultNumberSwitch(index, row) {
+      if (row.freeByNumber) {
         this.defaultData[index].free_by_number = 1
       }
     },
-    changeDefaultMoneySwitch (index, row) {
-      if (row.freeByMoney == true) {
+    changeDefaultMoneySwitch(index, row) {
+      if (row.freeByMoney) {
         this.defaultData[index].free_by_money = 1
       }
     },
-    changeDefaultNumberInput (index, row) {
-      if (row == 0) {
+    changeDefaultNumberInput(index, row) {
+      if (row === 0) {
         this.defaultData[index].freeByNumber = false
       }
     },
-    changeDefaultMoneyInput (index, row) {
-      if (row == 0) {
+    changeDefaultMoneyInput(index, row) {
+      if (row === 0) {
         this.defaultData[index].freeByMoney = false
       }
     },
 
-    changeNumberSwitch (index, row) {
-      if (row.freeByNumber == true) {
+    changeNumberSwitch(index, row) {
+      if (row.freeByNumber) {
         this.tableData[index].free_by_number = 1
       }
     },
-    changeMoneySwitch (index, row) {
-      if (row.freeByMoney == true) {
+    changeMoneySwitch(index, row) {
+      if (row.freeByMoney) {
         this.tableData[index].free_by_money = 1
       }
     },
-    changeNumberInput (index, row) {
-      if (row == 0) {
+    changeNumberInput(index, row) {
+      if (row === 0) {
         this.tableData[index].freeByNumber = false
       }
     },
-    changeMoneyInput (index, row) {
-      if (row == 0) {
+    changeMoneyInput(index, row) {
+      if (row === 0) {
         this.tableData[index].freeByMoney = false
       }
     },
-    submitValue (index, row) {
+    submitValue(index, row) {
       // console.log(row);
-      if (row == '' || row < 0) {
+      if (row === '' || row < 0) {
         this.$message({
           type: 'error',
           message: '值不能为空或小于零'
@@ -299,7 +318,7 @@ export default {
         return false
       }
     },
-    updateArea () {
+    updateArea() {
       const index = this.nowTableIndex
       const all = this.areaData
       let selected = this.selectedArea
@@ -323,7 +342,7 @@ export default {
 
       const newName = []
       for (const item in areaName) {
-        all.map(ele => (ele.id == areaName[item] ? newName.push(ele.name) : ''))
+        all.map(ele => +ele.id === areaName[item] ? newName.push(ele.name) : '')
       }
 
       // 将areaName 变成selected后等areaName;
@@ -337,13 +356,13 @@ export default {
       console.log('--------')
       that.specEditVisible = false
     },
-    onSaveTemplate () {
+    onSaveTemplate() {
       const name = this.infoForm.name
       const defa = this.defaultData
 
       // console.log(this.tableData);
 
-      if (name == '') {
+      if (!name) {
         this.$message({
           type: 'error',
           message: '名称不能为空'
@@ -352,14 +371,14 @@ export default {
       }
 
       for (const ele of defa) {
-        if (ele.start == 0 || ele.add == 0 || ele.start_fee < 0 || ele.add_fee < 0) {
+        if (ele.start === 0 || ele.add === 0 || ele.start_fee < 0 || ele.add_fee < 0) {
           this.$message({
             type: 'error',
             message: '值不能为空'
           })
           return false
         }
-        if (ele.area == '') {
+        if (!ele.area) {
           this.$message({
             type: 'error',
             message: '地区不能为空'
@@ -371,14 +390,14 @@ export default {
       const data = this.tableData
 
       for (const ele of data) {
-        if (ele.start == 0 || ele.add == 0 || ele.start_fee < 0 || ele.add_fee < 0) {
+        if (ele.start === 0 || ele.add === 0 || ele.start_fee < 0 || ele.add_fee < 0) {
           this.$message({
             type: 'error',
             message: '值不能为空'
           })
           return false
         }
-        if (ele.area == '') {
+        if (!ele.area) {
           this.$message({
             type: 'error',
             message: '地区不能为空'
@@ -410,15 +429,10 @@ export default {
         })
     },
 
-    onAddTemplate () {
+    onAddTemplate() {
       const name = this.infoForm.name
-      const freight_type = this.infoForm.freight_type
-
       const defa = this.defaultData
-
-      // console.log(this.tableData);
-
-      if (name == '') {
+      if (!name) {
         this.$message({
           type: 'error',
           message: '名称不能为空'
@@ -427,14 +441,14 @@ export default {
       }
 
       for (const ele of defa) {
-        if (ele.start == 0 || ele.add == 0 || ele.start_fee < 0 || ele.add_fee < 0) {
+        if (ele.start === 0 || ele.add === 0 || ele.start_fee < 0 || ele.add_fee < 0) {
           this.$message({
             type: 'error',
             message: '值不能为空'
           })
           return false
         }
-        if (ele.area == '') {
+        if (!ele.area) {
           this.$message({
             type: 'error',
             message: '地区不能为空'
@@ -446,14 +460,14 @@ export default {
       const data = this.tableData
 
       for (const ele of data) {
-        if (ele.start == 0 || ele.add == 0 || ele.start_fee < 0 || ele.add_fee < 0) {
+        if (ele.start === 0 || ele.add === 0 || ele.start_fee < 0 || ele.add_fee < 0) {
           this.$message({
             type: 'error',
             message: '值不能为空'
           })
           return false
         }
-        if (ele.area == '') {
+        if (!ele.area) {
           this.$message({
             type: 'error',
             message: '地区不能为空'
@@ -486,7 +500,7 @@ export default {
         })
     },
 
-    deleteRow (index, rows) {
+    deleteRow(index, rows) {
       this.$confirm('确定要删除?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -506,10 +520,10 @@ export default {
         // })
       })
     },
-    test () {
+    test() {
       console.log(this.tableData[0])
     },
-    add_template () {
+    add_template() {
       const ele = {
         template_id: '',
         area: '',
@@ -522,10 +536,10 @@ export default {
       }
       this.tableData.push(ele)
     },
-    goBackPage () {
+    goBackPage() {
       this.$router.go(-1)
     },
-    getAllAreaData () {
+    getAllAreaData() {
       const that = this
       this.axios.post('shipper/getareadata').then(response => {
         if (response.data.errno === 0) {
@@ -539,7 +553,7 @@ export default {
         }
       })
     },
-    handleRowEdit (index, row) {
+    handleRowEdit(index) {
       // console.log(row.id);
       this.nowTableIndex = index
       const nowArea = this.tableData[index].area
@@ -550,7 +564,7 @@ export default {
       const table = this.tableData
       let area = ''
       for (const ele in table) {
-        if (ele != index) {
+        if (ele !== index) {
           area = table[ele].area + ',' + area
         }
       }
@@ -565,7 +579,7 @@ export default {
       for (const item of all) {
         item.disabled = false
         for (const ele of area) {
-          if (item.id == ele) {
+          if (item.id === ele) {
             item.disabled = true
           }
         }
@@ -574,7 +588,7 @@ export default {
       this.specEditVisible = true
     },
 
-    getAreaData () {
+    getAreaData() {
       const that = this
       this.axios
         .post('shipper/freightdetail', {
@@ -587,7 +601,7 @@ export default {
           // that.defaultData = response.data.data.defaultData;
         })
     },
-    getInfo () {
+    getInfo() {
       if (this.infoForm.id <= 0) {
         return false
       }
@@ -604,13 +618,6 @@ export default {
           console.log(that.defaultData)
         })
     }
-  },
-  components: {},
-  mounted () {
-    this.infoForm.id = this.$route.query.id || 0
-    // console.log(this.infoForm.id);
-    this.getInfo()
-    this.getAllAreaData()
   }
 }
 </script>

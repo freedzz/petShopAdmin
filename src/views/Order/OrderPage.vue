@@ -39,7 +39,7 @@
             </div>
             <div class="content-wrap clearfix">
               <div class="left">
-                <div v-for="(iitem, index) in item.goodsList" :key="index" class="goods-list">
+                <div v-for="(iitem, idIndex) in item.goodsList" :key="idIndex" class="goods-list">
                   <img :src="iitem.list_pic_url" class="goods-img">
                   <div class="goods-name">{{ iitem.goods_aka }}</div>
                   <div class="goods-number">
@@ -48,7 +48,7 @@
                   </div>
                 </div>
               </div>
-              <div class="user-wrap">
+              <div v-if="item.userInfo" class="user-wrap">
                 <div class="avatar-wrap">
                   <img :src="item.userInfo.avatar" class="avatar-img">
                   <div class="nickname">{{ item.userInfo.nickname }}</div>
@@ -495,7 +495,29 @@
 // import VueBarcode from '../../../../node_modules/vue-barcode'
 // import ElButton from "../../../../node_modules/element-ui/packages/button/src/button.vue";
 // Vue.component(VueBarcode.name, VueBarcode);
-import { rePrintExpress, directPrintExpress, checkExpress, orderReceive, getMianExpress, goDelivery, goPrintOnly, orderPrice, getAutoStatus, getOrderDetail, getOrderDestory, onPrintNum, saveAdminMemo, savePrintInfo, saveRemarkInfo, getOrder, getAllRegion, deliveryGoGo, getDeliveyInfo, saveExpressValueInfo, getOrderpack } from '@/api/order/order'
+import {
+  rePrintExpress,
+  directPrintExpress,
+  checkExpress,
+  orderReceive,
+  getMianExpress,
+  goDelivery,
+  goPrintOnly,
+  orderPrice,
+  getAutoStatus,
+  getOrderDetail,
+  getOrderDestory,
+  onPrintNum,
+  saveAdminMemo,
+  savePrintInfo,
+  saveRemarkInfo,
+  getOrder,
+  getAllRegion,
+  deliveryGoGo,
+  getDeliveyInfo,
+  saveExpressValueInfo,
+  getOrderpack
+} from '@/api/order/order'
 import VueBarcode from 'vue-barcode'
 
 export default {
@@ -503,7 +525,7 @@ export default {
     // ElButton,
     barcode: VueBarcode
   },
-  data () {
+  data() {
     return {
       autoGoDelivery: true,
       sfHasValue: {},
@@ -564,7 +586,7 @@ export default {
   // created(){
   //     this.getList();
   // },
-  mounted () {
+  mounted() {
     this.getList()
     this.getAutoStatus()
     this.getDeliveyInfo()
@@ -572,27 +594,27 @@ export default {
     this.getAllRegion()
   },
   methods: {
-    hidePrintDialog () {
+    hidePrintDialog() {
       this.dform.method = 2
       this.dialogFormVisible = false
       console.log('11111')
     },
-    goodsPriceChange (value) {
+    goodsPriceChange(value) {
       console.log(value)
       this.orderInfo.goods_price = value
       this.orderInfo.actual_price = Number(this.orderInfo.goods_price) + Number(this.orderInfo.freight_price)
     },
-    freightPriceChange (value) {
+    freightPriceChange(value) {
       this.orderInfo.freight_price = value
       this.orderInfo.actual_price = Number(this.orderInfo.goods_price) + Number(value)
     },
-    async getAllRegion () {
+    async getAllRegion() {
       const res = await getAllRegion()
       if (res.errno === 0) {
         this.options = res.data
       }
     },
-    async deliveryGoGo () {
+    async deliveryGoGo() {
       if (+this.dform.method === 2) {
         if (!this.dform.logistic_code) {
           this.$message({
@@ -614,12 +636,12 @@ export default {
         this.getList()
       }
     },
-    getDeliveyInfo () {
+    getDeliveyInfo() {
       getDeliveyInfo().then(response => {
         this.deliveryCom = response.data
       })
     },
-    async changeExpressValue (info) {
+    async changeExpressValue(info) {
       if (+this.expressType === 1) {
         const res = await saveExpressValueInfo({
           express_value: info.express_value,
@@ -638,16 +660,15 @@ export default {
         }
       }
     },
-    confirm () {
+    confirm() {
       getOrderpack({
         orderId: this.order_id
+      }).then(() => {
+        this.dialogVisible = false
+        this.getList()
       })
-        .then(() => {
-          this.dialogVisible = false
-          this.getList()
-        })
     },
-    async changeRemarkInfo (info) {
+    async changeRemarkInfo(info) {
       const res = await saveRemarkInfo({
         remark: info.remark,
         id: info.id
@@ -664,7 +685,7 @@ export default {
         })
       }
     },
-    async changeInfo (info) {
+    async changeInfo(info) {
       const id = info.id
       const printInfo = info.print_info
       const res = await savePrintInfo({
@@ -683,7 +704,7 @@ export default {
         })
       }
     },
-    async changeMemo (id, text) {
+    async changeMemo(id, text) {
       const res = await saveAdminMemo({
         text: text,
         id: id
@@ -700,23 +721,22 @@ export default {
         })
       }
     },
-    cancelPrint () {
+    cancelPrint() {
       this.printMiandan = false
       this.dialogFormVisible = false
     },
-    handleCheckedCitiesChange () {
+    handleCheckedCitiesChange() {
       console.log('哈哈')
     },
-    onPrintNum () {
+    onPrintNum() {
       onPrintNum(this.testApi, this.testData, {
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
+      }).then(response => {
+        console.log(response.data)
       })
-        .then(response => {
-          console.log(response.data)
-        })
     },
-    viewDetail (index) {
+    viewDetail(index) {
       this.$router.push({
         name: 'order_detail',
         query: {
@@ -724,7 +744,7 @@ export default {
         }
       })
     },
-    handleClick (tab) {
+    handleClick(tab) {
       const pindex = tab._data.index
       if (+pindex === 0) {
         this.order_status = '101,801'
@@ -742,14 +762,14 @@ export default {
       this.getList()
     },
 
-    handlePageChange (val) {
+    handlePageChange(val) {
       this.page = val
       // 保存到localStorage
       localStorage.setItem('orderPage', this.page)
       localStorage.setItem('orderFilterForm', JSON.stringify(this.filterForm))
       this.getList()
     },
-    handleRowEdit (index, row) {
+    handleRowEdit(index, row) {
       this.$router.push({
         name: 'order_detail',
         query: {
@@ -757,7 +777,7 @@ export default {
         }
       })
     },
-    handleRowDelete (index, row) {
+    handleRowDelete(index, row) {
       this.$confirm('确定要删除?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -775,11 +795,11 @@ export default {
         }
       })
     },
-    onSubmitFilter () {
+    onSubmitFilter() {
       this.page = 1
       this.getList()
     },
-    async getList () {
+    async getList() {
       const res = await getOrder({
         page: this.page,
         orderSn: this.filterForm.order_sn,
@@ -788,12 +808,12 @@ export default {
         status: this.order_status
       })
       if (res.errno === 0) {
-        this.tableData = res.data
-        this.page = res.currentPage
+        this.tableData = res.data.data
+        this.page = res.data.currentPage
         this.total = res.data.count
       }
     },
-    orderEdit (item) {
+    orderEdit(item) {
       this.rePrintStatus = 0
       this.order_id = item.id
       if (+item.order_status === 300 || +item.order_status === 301) {
@@ -806,23 +826,23 @@ export default {
         this.dialogVisible2 = true
       }
     },
-    async rePrintExpress () {
+    async rePrintExpress() {
       this.rePrintStatus = 0
       let res = await rePrintExpress({
         orderId: this.order_id
       })
-      if(res.errno === 0) {
+      if (res.errno === 0) {
         this.expressType = 0
         this.getOrderInfo(this.order_id)
         this.dialogFormVisible = true
       }
     },
-    async directPrintExpress () {
+    async directPrintExpress() {
       this.rePrintStatus = 1
       let res = await directPrintExpress({
         orderId: this.order_id
       })
-      if(res.errno === 0) {
+      if (res.errno === 0) {
         const express = res.data
         this.expressType = express.express_type
         const orderInfo = this.orderInfo
@@ -833,13 +853,12 @@ export default {
           MarkDestination: express.region_code,
           send_time: express.send_time,
           MonthCode: express.MonthCode
-
         }
         this.expressType = 0
         this.dialogFormVisible = true
       }
     },
-    directPrintConfirm () {
+    directPrintConfirm() {
       const expressType = this.expressType
       if (+expressType === 0) {
         this.$message({
@@ -855,28 +874,28 @@ export default {
       this.dialogFormVisible = false
       this.dialogExpressVisible = false
     },
-    async checkExpressInfo () {
+    async checkExpressInfo() {
       this.getOrderInfo(this.order_id)
       let res = await checkExpress({
         orderId: this.order_id
       })
-      if(!res.errno) {
+      if (!res.errno) {
         this.dialogExpressVisible = true
       } else {
         this.expressType = 0
         this.dialogFormVisible = true
       }
     },
-    async receiveConfirm () {
+    async receiveConfirm() {
       let res = await orderReceive({
         orderId: this.order_id
       })
-      if(!res.errno) {
+      if (!res.errno) {
         this.dialogVisible2 = false
         this.getList()
       }
     },
-    async deliveyGoConfirm () {
+    async deliveyGoConfirm() {
       // 可以设置成不预览，那么直接打印了
       // 逻辑：打印快递单，这时会向快递鸟发送请求，然后得到快递单号,
       const expressType = this.expressType
@@ -896,7 +915,7 @@ export default {
         receiver: this.receiver,
         expressType: expressType
       })
-      if(!res.errno) {
+      if (!res.errno) {
         const expressInfo = res.data.latestExpressInfo
         if (+expressInfo.ResultCode === 100) {
           this.rawHtml = expressInfo.PrintTemplate
@@ -926,11 +945,11 @@ export default {
         // newWindow.print();   //打印当前窗口
       }
     },
-    async deliveryConfirm (id) {
+    async deliveryConfirm(id) {
       let res = await goDelivery({
         order_id: id
       })
-      if(!res.errno) {
+      if (!res.errno) {
         this.getList()
         this.$message({
           type: 'success',
@@ -943,11 +962,11 @@ export default {
         })
       }
     },
-    async printAndDeliveryConfirm () {
+    async printAndDeliveryConfirm() {
       let res = await goDelivery({
         order_id: this.order_id
       })
-      if(!res.errno) {
+      if (!res.errno) {
         this.getList()
         this.printMiandan = false
         this.dialogFormVisible = false
@@ -966,11 +985,11 @@ export default {
         })
       }
     },
-    async printOnlyConfirm () {
+    async printOnlyConfirm() {
       let res = await goPrintOnly({
         order_id: this.order_id
       })
-      if(!res.errno) {
+      if (!res.errno) {
         this.getList()
         this.printMiandan = false
         this.dialogFormVisible = false
@@ -989,7 +1008,7 @@ export default {
         })
       }
     },
-    printit1 () {
+    printit1() {
       var mywindow = window.open('', 'PRINT', 'height=1500,width=1000')
       mywindow.document.write('<html><head><title></title>')
       mywindow.document.write('</head><body >')
@@ -1001,7 +1020,7 @@ export default {
       mywindow.close()
       return true
     },
-    printit2 () {
+    printit2() {
       var mywindow = window.open('', 'PRINT', 'height=1500,width=1000')
       mywindow.document.write('<html><head><title></title>')
       mywindow.document.write('</head><body >')
@@ -1013,7 +1032,7 @@ export default {
       mywindow.close()
       return true
     },
-    printit3 () {
+    printit3() {
       var mywindow = window.open('', 'PRINT', 'height=1800,width=1000')
       mywindow.document.write('<html><head><title></title>')
       mywindow.document.write('</head><body >')
@@ -1025,7 +1044,7 @@ export default {
       mywindow.close()
       return true
     },
-    async priceChangeConfirm () {
+    async priceChangeConfirm() {
       if (!this.orderInfo.actual_price) {
         this.$message({
           type: 'error',
@@ -1039,23 +1058,23 @@ export default {
         freightPrice: this.orderInfo.freight_price,
         goodsPrice: this.orderInfo.goods_price
       })
-      if(!res.errno) {
+      if (!res.errno) {
         this.dialogPriceVisible = false
         this.getList()
       }
     },
-    async getAutoStatus () {
+    async getAutoStatus() {
       let res = await getAutoStatus()
-      if(!res.errno) {
+      if (!res.errno) {
         const ele = res.data
         this.autoGoDelivery = +ele === 1 ? true : false
       }
     },
-    async getOrderInfo () {
+    async getOrderInfo() {
       let res = await getOrderDetail({
         orderId: this.order_id
       })
-      if(!res.errno) {
+      if (!res.errno) {
         this.orderInfo = res.data.orderInfo
         this.receiver = res.data.receiver
         this.sender = res.data.sender
@@ -1066,7 +1085,7 @@ export default {
         this.senderOptions.push(this.sender.province_id, this.sender.city_id, this.sender.district_id)
       }
     },
-    deliveryMethodChange (val) {
+    deliveryMethodChange(val) {
       if (+val !== 1) {
         this.expressType = 0
       }

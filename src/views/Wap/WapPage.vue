@@ -15,39 +15,39 @@
 
 </style>
 <template>
-    <div class="container">
-        <sidebar></sidebar>
-        <navbar></navbar>
-        <div class="content">
-            <transition name="router-fade" mode="out-in">
-                <router-view></router-view>
-            </transition>
-        </div>
+  <div class="container">
+    <sidebar></sidebar>
+    <navbar></navbar>
+    <div class="content">
+      <transition name="router-fade" mode="out-in">
+        <router-view></router-view>
+      </transition>
     </div>
+  </div>
 </template>
 <script>
-    import Sidebar from 'Common/Sidebar';
-    import Navbar from 'Common/Navbar';
+import Sidebar from 'Common/Sidebar'
+import Navbar from 'Common/Navbar'
 
-    export default {
-        data() {
-            return {
-                dialogVisible: false,
-            }
-        },
-        components: {
-            Sidebar,
-            Navbar
-        },
-        methods: {
-            handleOpen(key, keyPath) {
-                console.log(key, keyPath);
-            },
-            handleClose(key, keyPath) {
-                console.log(key, keyPath);
-            },
-        },
-
+export default {
+  components: {
+    Sidebar,
+    Navbar
+  },
+  data() {
+    return {
+      dialogVisible: false,
     }
+  },
+  methods: {
+    handleOpen(key, keyPath) {
+      console.log(key, keyPath)
+    },
+    handleClose(key, keyPath) {
+      console.log(key, keyPath)
+    },
+  },
+
+}
 
 </script>

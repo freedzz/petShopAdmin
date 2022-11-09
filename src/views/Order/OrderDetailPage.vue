@@ -7,7 +7,7 @@
         <el-breadcrumb-item>{{ infoForm.order_sn ? '订单详情' : '添加订单' }}</el-breadcrumb-item>
       </el-breadcrumb>
       <div class="operation-nav">
-        <el-button type="primary" @click="goBackPage" size="small" icon="arrow-left">返回列表</el-button>
+        <el-button type="primary" size="small" icon="arrow-left" @click="goBackPage">返回列表</el-button>
         <!--<el-button type="primary" @click="test" size="small" icon="arrow-left">test</el-button>-->
       </div>
     </div>
@@ -29,7 +29,7 @@
               <el-table-column prop="nickname" label="昵称" width="100"></el-table-column>
               <el-table-column prop="avatar" label="头像" width="80">
                 <template slot-scope="scope">
-                  <img :src="scope.row.avatar" alt="" style="width: 60px;height: 60px" />
+                  <img :src="scope.row.avatar" alt="" style="width: 60px;height: 60px">
                 </template>
               </el-table-column>
               <el-table-column prop="name" label="客户名" width="100"></el-table-column>
@@ -48,7 +48,7 @@
               <el-table-column prop="list_pic_url" label="商品图" width="120">
                 list_pic_url
                 <template slot-scope="scope">
-                  <img :src="scope.row.list_pic_url" alt="" style="width: 60px;height: 60px" />
+                  <img :src="scope.row.list_pic_url" alt="" style="width: 60px;height: 60px">
                 </template>
               </el-table-column>
               <el-table-column prop="goods_name" label="商品名"></el-table-column>
@@ -81,7 +81,13 @@
             </div>
             <div class="memo-wrap">
               <div class="content-title">卖家备注：</div>
-              <el-input class="memo-input" type="textarea" autosize placeholder="请输入内容" v-model="infoForm.admin_memo"></el-input>
+              <el-input
+                v-model="infoForm.admin_memo"
+                class="memo-input"
+                type="textarea"
+                autosize
+                placeholder="请输入内容"
+              ></el-input>
               <el-button size="small" type="primary" @click="saveAdminMemo">保存</el-button>
             </div>
 
@@ -98,27 +104,27 @@
                 <div class="t">加入时间：</div>
                 <div class="c">{{ infoForm.add_time }}</div>
               </div>
-              <div class="item" v-if="infoForm.pay_time">
+              <div v-if="infoForm.pay_time" class="item">
                 <div class="t">付款时间：</div>
                 <div class="c">{{ infoForm.pay_time }}</div>
               </div>
-              <div class="item" v-if="infoForm.shipping_time">
+              <div v-if="infoForm.shipping_time" class="item">
                 <div class="t">发货时间：</div>
                 <div class="c">{{ infoForm.shipping_time }}</div>
               </div>
-              <div class="item" v-if="infoForm.confirm_time">
+              <div v-if="infoForm.confirm_time" class="item">
                 <div class="t">确认时间：</div>
                 <div class="c">{{ infoForm.confirm_time }}</div>
               </div>
-              <div class="item" v-if="infoForm.dealdone_time">
+              <div v-if="infoForm.dealdone_time" class="item">
                 <div class="t">完成时间：</div>
                 <div class="c">{{ infoForm.dealdone_time }}</div>
               </div>
             </div>
           </el-tab-pane>
           <el-tab-pane label="物流信息" name="second">
-            <div class="no-traces" v-if="expressData.logistic_code == ''">暂无物流信息</div>
-            <div class="has-traces" v-else>
+            <div v-if="expressData.logistic_code == ''" class="no-traces">暂无物流信息</div>
+            <div v-else class="has-traces">
               <p>
                 <label>快递公司：</label>
                 <span>{{ expressData.shipper_name }}</span>
@@ -131,7 +137,7 @@
               <div v-if="on_posting == 1" class="posting">正在查询，请稍候...</div>
 
               <ul class="traces-wrap">
-                <li class="traces-list" v-for="item in expressData.traces">
+                <li v-for="(item, index) in expressData.traces" :key="index" class="traces-list">
                   <div class="traces-time">{{ item.time }}</div>
                   <div class="traces-content">{{ item.status }}</div>
                 </li>
@@ -145,18 +151,24 @@
     </div>
     <el-dialog title="修改地址" :visible.sync="dialogAddressVisible">
       <el-form :model="nowAddressData">
-        <el-form-item label="所在地区:" label-width="120px"><el-cascader :options="options" placeholder="请选择" v-model="addOptions"></el-cascader></el-form-item>
-        <el-form-item label="详细地址:" label-width="120px">
-          <el-input class="el-input" v-model="nowAddressData.cAddress" auto-complete="off" placeholder="请输入详细地"></el-input>
+        <el-form-item label="所在地区:" labelWidth="120px"><el-cascader v-model="addOptions" :options="options" placeholder="请选择"></el-cascader></el-form-item>
+        <el-form-item label="详细地址:" labelWidth="120px">
+          <el-input v-model="nowAddressData.cAddress" class="el-input" autoComplete="off" placeholder="请输入详细地"></el-input>
         </el-form-item>
-        <el-form-item label="收货人:" label-width="120px">
-          <el-input class="el-input" v-model="nowAddressData.name" auto-complete="off" placeholder="请输入收货人"></el-input>
+        <el-form-item label="收货人:" labelWidth="120px">
+          <el-input v-model="nowAddressData.name" class="el-input" autoComplete="off" placeholder="请输入收货人"></el-input>
         </el-form-item>
-        <el-form-item label="手机:" label-width="120px">
-          <el-input class="el-input" v-model="nowAddressData.mobile" auto-complete="off" placeholder="请输入收货人手机"></el-input>
+        <el-form-item label="手机:" labelWidth="120px">
+          <el-input v-model="nowAddressData.mobile" class="el-input" autoComplete="off" placeholder="请输入收货人手机"></el-input>
         </el-form-item>
-        <el-form-item label="留言:" label-width="120px">
-          <el-input class="el-input" v-model="nowAddressData.postscript" auto-complete="off" placeholder="" :disabled="true"></el-input>
+        <el-form-item label="留言:" labelWidth="120px">
+          <el-input
+            v-model="nowAddressData.postscript"
+            class="el-input"
+            autoComplete="off"
+            placeholder=""
+            :disabled="true"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -166,24 +178,24 @@
     </el-dialog>
     <el-dialog title="修改商品" :visible.sync="dialogGoodsListVisible">
       <el-form :model="goodsData">
-        <el-form-item label="id:" label-width="120px">
+        <el-form-item label="id:" labelWidth="120px">
           <label>{{ goodsData.goods_id }}</label>
         </el-form-item>
-        <el-form-item label="商品图:" label-width="120px">
-          <template slot-scope="scope">
-            <img :src="goodsData.list_pic_url" alt="" style="width: 60px;height: 60px" />
+        <el-form-item label="商品图:" labelWidth="120px">
+          <template>
+            <img :src="goodsData.list_pic_url" alt="" style="width: 60px;height: 60px">
           </template>
         </el-form-item>
-        <el-form-item label="商品名:" label-width="120px">
+        <el-form-item label="商品名:" labelWidth="120px">
           <label>{{ goodsData.goods_name }}</label>
         </el-form-item>
-        <el-form-item label="商品型号:" label-width="120px">
+        <el-form-item label="商品型号:" labelWidth="120px">
           <label>{{ goodsData.goods_specifition_name_value }}</label>
         </el-form-item>
-        <el-form-item label="售价:" label-width="120px">
+        <el-form-item label="售价:" labelWidth="120px">
           <label>{{ goodsData.retail_price }}</label>
         </el-form-item>
-        <el-form-item label="购买数量:" label-width="120px"><el-input-number v-model="goodsData.number" :min="1" label="购买的数量"></el-input-number></el-form-item>
+        <el-form-item label="购买数量:" labelWidth="120px"><el-input-number v-model="goodsData.number" :min="1" label="购买的数量"></el-input-number></el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogGoodsListVisible = false">取 消</el-button>
@@ -199,8 +211,8 @@
     </el-dialog>
     <el-dialog title="变更状态" :visible.sync="statusVisible" width="30%">
       <el-form :model="statusData">
-        <el-form-item label="状态:" label-width="120px">
-          <el-select class="el-select-class" v-model="statusValue" placeholder="选择状态">
+        <el-form-item label="状态:" labelWidth="120px">
+          <el-select v-model="statusValue" class="el-select-class" placeholder="选择状态">
             <!---->
             <el-option v-for="item in statusList" :key="item.value" :label="item.label" :value="item.value"></el-option>
           </el-select>
@@ -218,7 +230,10 @@
 // import ElButton from '../../../../node_modules/element-ui/packages/button/src/button.vue'
 
 export default {
-  data () {
+  components: {
+    // ElButton
+  },
+  data() {
     return {
       statusList: [
         {
@@ -271,21 +286,27 @@ export default {
       on_posting: 0
     }
   },
+  mounted() {
+    //            console.log(this.$route.query);
+    this.infoForm.id = this.$route.query.id || 0
+    this.getInfo()
+    this.getAllRegion()
+  },
   methods: {
-    changeStatus () {
+    changeStatus() {
       this.statusVisible = true
     },
-    statusConfirm () {
-      this.axios.post('order/changeStatus', { status: this.statusValue, orderSn: this.infoForm.order_sn }).then(response => {
+    statusConfirm() {
+      this.axios.post('order/changeStatus', { status: this.statusValue, orderSn: this.infoForm.order_sn }).then(() => {
         //                    console.log(response.data);
         this.getInfo()
         this.statusVisible = false
       })
     },
-    handleClick (tab, event) {
+    handleClick(tab) {
       const pindex = tab._data.index
-      if (pindex == 1) {
-        if (this.is_finish == 0) {
+      if (+pindex === 1) {
+        if (+this.is_finish === 0) {
           this.on_posting = 1
           this.axios.post('order/getOrderExpress', { orderId: this.infoForm.id }).then(response => {
             this.expressData = response.data.data
@@ -296,27 +317,27 @@ export default {
         }
       }
     },
-    PackageConfirm () {
+    PackageConfirm() {
       this.axios
         .get('order/orderpack', {
           params: {
             orderSn: this.infoForm.order_sn
           }
         })
-        .then(response => {
+        .then(() => {
           this.dialogVisible = false
           this.addressData = []
           this.getInfo()
         })
     },
-    goPackage () {
+    goPackage() {
       this.dialogVisible = true
     },
-    test () {
+    test() {
       console.log(this.addressData)
       console.log(this.infoForm)
     },
-    handleRowDelete (index, row) {
+    handleRowDelete(index, row) {
       this.goodsData = row
       this.goodsData.order_id = this.infoForm.id
       this.$confirm('确定要删除?', '提示', {
@@ -342,14 +363,14 @@ export default {
           //                    });
         })
     },
-    saveGoodsList () {
+    saveGoodsList() {
       this.goodsData.order_id = this.infoForm.id
       const old = this.oldGoodsNumber
       const now = this.goodsData.number
       console.log(old)
       console.log(now)
 
-      if (old != now) {
+      if (old !== now) {
         let number = 0
         let addOrMinus = 0
         if (old > now) {
@@ -361,7 +382,7 @@ export default {
         this.goodsData.number = number
         this.goodsData.addOrMinus = addOrMinus
         this.axios.post('order/saveGoodsList', this.goodsData).then(response => {
-          //                        console.log(response.data);
+          console.log(response)
           //                        this.dialogGoodsListVisible = false;
           //                        this.infoForm.order_sn = response.data.data;
           //
@@ -373,7 +394,7 @@ export default {
         this.dialogGoodsListVisible = false
       }
     },
-    saveAdminMemo () {
+    saveAdminMemo() {
       this.axios
         .post('order/saveAdminMemo', {
           text: this.infoForm.admin_memo,
@@ -396,7 +417,7 @@ export default {
           }
         })
     },
-    saveAddress () {
+    saveAddress() {
       this.nowAddressData.order_sn = this.infoForm.order_sn
       this.nowAddressData.addOptions = this.addOptions
       this.axios.post('order/saveAddress', this.nowAddressData).then(response => {
@@ -420,26 +441,27 @@ export default {
         }
       })
     },
-    onSubmitInfo () {},
-    goBackPage () {
+    onSubmitInfo() {
+      console.log('onSubmitInfo')
+    },
+    goBackPage() {
       this.$router.go(-1)
     },
-    addressEdit () {
+    addressEdit() {
       this.dialogAddressVisible = true
     },
-    goodsListEdit (index, info) {
+    goodsListEdit(index, info) {
       console.log(info)
       this.goodsData = info
       this.oldGoodsNumber = info.number
       this.dialogGoodsListVisible = true
     },
-    getAllRegion () {
-      const that = this
+    getAllRegion() {
       this.axios.get('order/getAllRegion').then(response => {
         this.options = response.data.data
       })
     },
-    getInfo () {
+    getInfo() {
       if (this.infoForm.id <= 0) {
         return false
       }
@@ -471,15 +493,6 @@ export default {
           console.log(this.infoForm)
         })
     }
-  },
-  components: {
-    // ElButton
-  },
-  mounted () {
-    //            console.log(this.$route.query);
-    this.infoForm.id = this.$route.query.id || 0
-    this.getInfo()
-    this.getAllRegion()
   }
 }
 </script>

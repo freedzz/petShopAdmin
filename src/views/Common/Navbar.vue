@@ -1,32 +1,32 @@
 <template>
-    <div class="right-box">
-        <div class="navbar">
-            <div class="menu">
-                <div class="menu-item">
-                    <i class="fa fa-sign-out" @click="logout"></i>
-                </div>
-            </div>
+  <div class="right-box">
+    <div class="navbar">
+      <div class="menu">
+        <div class="menu-item">
+          <i class="fa fa-sign-out" @click="logout"></i>
         </div>
+      </div>
     </div>
+  </div>
 </template>
 <script>
-    export default {
-        data() {
-            return {}
-        },
-        methods: {
-            logout() {
-                this.$confirm('是否要退出?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    localStorage.clear();
-                    this.$router.replace({name: 'login'});
-                });
-            }
-        }
+export default {
+  data() {
+    return {}
+  },
+  methods: {
+    logout() {
+      this.$confirm('是否要退出?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        localStorage.clear()
+        this.$router.replace({name: 'login'})
+      })
     }
+  }
+}
 
 </script>
 

@@ -34,7 +34,13 @@
         </el-table>
       </div>
       <div class="page-box">
-        <el-pagination @current-change="handlePageChange" :current-page="page" :page-size="10" layout="total, prev, pager, next, jumper" :total="total"></el-pagination>
+        <el-pagination
+          :currentPage="page"
+          :pageSize="10"
+          layout="total, prev, pager, next, jumper"
+          :total="total"
+          @current-change="handlePageChange"
+        ></el-pagination>
       </div>
     </div>
   </div>
@@ -42,7 +48,8 @@
 
 <script>
 export default {
-  data () {
+  components: {},
+  data() {
     return {
       page: 1,
       total: 0,
@@ -52,18 +59,21 @@ export default {
       tableData: []
     }
   },
+  mounted() {
+    this.getList()
+  },
   methods: {
-    handlePageChange (val) {
+    handlePageChange(val) {
       this.page = val
       // 保存到localStorage
       localStorage.setItem('keywordsPage', this.page)
       localStorage.setItem('keywordsFilterForm', JSON.stringify(this.filterForm))
       this.getList()
     },
-    handleRowEdit (index, row) {
+    handleRowEdit(index, row) {
       this.$router.push({ name: 'keywords_add', query: { id: row.id } })
     },
-    handleRowDelete (index, row) {
+    handleRowDelete(index, row) {
       this.$confirm('确定要删除?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -82,11 +92,11 @@ export default {
         })
       })
     },
-    onSubmitFilter () {
+    onSubmitFilter() {
       this.page = 1
       this.getList()
     },
-    getList () {
+    getList() {
       this.axios
         .get('keywords', {
           params: {
@@ -100,10 +110,6 @@ export default {
           this.total = response.data.data.count
         })
     }
-  },
-  components: {},
-  mounted () {
-    this.getList()
   }
 }
 </script>

@@ -18,17 +18,14 @@ module.exports = {
     'moment': true,
     'axios': true,
     '$': true,
-    'EvoMapManager': true,
-    'ol': true,
-    'Hls': true,
     'JSEncrypt': true,
     'utils': true,
-    'DHMapLib': true,
     'Vuex': true,
     'VueRouter': true,
-    'PlayerControl': true,
-    'WSPlayer': true,
-    'require': true
+    'hljs': true,
+    'require': true,
+    'module': true,
+    'process': true
   },
   // add your custom rules here
   // 0 = off, 1 = warn, 2 = error

@@ -5,7 +5,7 @@
         <el-breadcrumb-item :to="{ name: 'user' }">会员管理</el-breadcrumb-item>
         <el-breadcrumb-item>会员详情</el-breadcrumb-item>
       </el-breadcrumb>
-      <div class="operation-nav"><el-button type="primary" @click="goBackPage" icon="arrow-left">返回列表</el-button></div>
+      <div class="operation-nav"><el-button type="primary" icon="arrow-left" @click="goBackPage">返回列表</el-button></div>
     </div>
     <div class="content-main">
       <div class="form-table-box">
@@ -13,18 +13,18 @@
           <el-table-column prop="id" label="ID" width="60"></el-table-column>
           <el-table-column label="头像" width="80">
             <template slot-scope="scope">
-              <img :src="scope.row.avatar" alt="" style="width: 50px;height: 50px" />
+              <img :src="scope.row.avatar" alt="" style="width: 50px;height: 50px">
             </template>
           </el-table-column>
           <el-table-column prop="nickname" width="80" label="昵称"></el-table-column>
           <el-table-column prop="name" width="110" label="姓名">
             <template slot-scope="scope">
-              <el-input size="mini" v-model="scope.row.name" placeholder="姓名" @blur="submitName(scope.$index, scope.row)"></el-input>
+              <el-input v-model="scope.row.name" size="mini" placeholder="姓名" @blur="submitName(scope.$index, scope.row)"></el-input>
             </template>
           </el-table-column>
           <el-table-column prop="name" width="160" label="手机">
             <template slot-scope="scope">
-              <el-input size="mini" v-model="scope.row.mobile" placeholder="手机" @blur="submitMobile(scope.$index, scope.row)"></el-input>
+              <el-input v-model="scope.row.mobile" size="mini" placeholder="手机" @blur="submitMobile(scope.$index, scope.row)"></el-input>
             </template>
           </el-table-column>
           <el-table-column prop="gender" label="性别" width="60">
@@ -39,21 +39,21 @@
       <div class="block-box">
         <div class="block">
           <div class="text">提交订单数:</div>
-          <div class="num">{{ this.dataInfo.orderSum }}笔</div>
+          <div class="num">{{ dataInfo.orderSum }}笔</div>
         </div>
         <div class="block">
           <div class="text">成交订单:</div>
-          <div class="num">{{ this.dataInfo.orderDone }}笔</div>
+          <div class="num">{{ dataInfo.orderDone }}笔</div>
         </div>
         <div class="block">
           <div class="text">消费金额:</div>
-          <div class="num" v-if="this.dataInfo.orderMoney == null">0元</div>
-          <div class="num" v-else>{{ this.dataInfo.orderMoney }}元</div>
+          <div v-if="!dataInfo.orderMoney" class="num">0元</div>
+          <div v-else class="num">{{ dataInfo.orderMoney }}元</div>
         </div>
         <div class="block">
           <div class="text">加入购物车:</div>
-          <div class="num" v-if="this.dataInfo.cartSum == null">0件</div>
-          <div class="num" v-else>{{ this.dataInfo.cartSum }}件</div>
+          <div v-if="!dataInfo.cartSum" class="num">0件</div>
+          <div v-else class="num">{{ dataInfo.cartSum }}件</div>
         </div>
       </div>
       <el-tabs v-model="activeName" @tab-click="handleClick">
@@ -62,8 +62,8 @@
         <el-tab-pane label="购物车" name="third"></el-tab-pane>
         <el-tab-pane label="足迹" name="fourth"></el-tab-pane>
       </el-tabs>
-      <div class="form-table-box" v-if="this.pIndex == 0">
-        <div v-for="item in orderData" class="list-wrap clearfix">
+      <div v-if="pIndex == 0" class="form-table-box">
+        <div v-for="(item, index) in orderData" :key="index" class="list-wrap clearfix">
           <div class="header clearfix">
             <div class="status-text">{{ item.order_status_text }}</div>
             <div class="add-time">{{ item.add_time }}</div>
@@ -74,8 +74,8 @@
           </div>
           <div class="content-wrap clearfix">
             <div class="left">
-              <div class="goods-list" v-for="iitem in item.goodsList">
-                <img :src="iitem.list_pic_url" class="goods-img" />
+              <div v-for="(iitem, idIndex) in item.goodsList" :key="idIndex" class="goods-list">
+                <img :src="iitem.list_pic_url" class="goods-img">
                 <div class="goods-name">{{ iitem.goods_name }}</div>
                 <div class="goods-spec">{{ iitem.goods_specifition_name_value }}</div>
                 <div class="goods-number">数量：{{ iitem.number }}</div>
@@ -90,11 +90,11 @@
               <div class="user-address">{{ item.full_region }}{{ item.address }}</div>
               <div class="user-post">{{ item.postscript }}</div>
             </div>
-            <div class="right"><el-button class="right-detail" type="text" @click="viewDetail(item.order_sn)" size="mini">查看详情</el-button></div>
+            <div class="right"><el-button class="right-detail" type="text" size="mini" @click="viewDetail(item.order_sn)">查看详情</el-button></div>
           </div>
         </div>
       </div>
-      <div class="address-wrap" v-if="this.pIndex == 1">
+      <div v-if="pIndex == 1" class="address-wrap">
         <div class="coupon-w">
           <div class="top">
             <div class="l">
@@ -104,7 +104,7 @@
             </div>
             <div class="r">操作</div>
           </div>
-          <div class="bottom" v-for="item in addressData">
+          <div v-for="(item, index) in addressData" :key="index" class="bottom">
             <div class="l">
               <div class="f1" style="width: 100px;">{{ item.name }}</div>
               <div class="f1" style="width: 100px;">{{ item.mobile }}</div>
@@ -114,12 +114,12 @@
           </div>
         </div>
       </div>
-      <div class="form-table-box" v-if="this.pIndex == 2">
+      <div v-if="pIndex == 2" class="form-table-box">
         <el-table :data="cartData" style="width: 100%" border stripe>
           <el-table-column prop="goods_id" label="商品ID" width="100px"></el-table-column>
           <el-table-column prop="list_pic_url" label="图片" width="70px">
             <template slot-scope="scope">
-              <img :src="scope.row.list_pic_url" alt="" style="width: 50px;height: 50px" />
+              <img :src="scope.row.list_pic_url" alt="" style="width: 50px;height: 50px">
             </template>
           </el-table-column>
           <el-table-column prop="goods_name" label="商品名称"></el-table-column>
@@ -134,32 +134,38 @@
           </el-table-column>
         </el-table>
       </div>
-      <div class="form-table-box" v-if="this.pIndex == 3">
+      <div v-if="pIndex == 3" class="form-table-box">
         <el-table :data="footData" style="width: 100%" stripe>
           <el-table-column prop="id" label="商品ID" width="100px"></el-table-column>
           <el-table-column prop="list_pic_url" label="图片" width="70px">
             <template slot-scope="scope">
-              <img :src="scope.row.list_pic_url" alt="" style="width: 50px;height: 50px" />
+              <img :src="scope.row.list_pic_url" alt="" style="width: 50px;height: 50px">
             </template>
           </el-table-column>
           <el-table-column prop="name" label="商品名称"></el-table-column>
         </el-table>
       </div>
       <div class="page-box">
-        <el-pagination @current-change="handlePageChange" :current-page="page" :page-size="10" layout="total, prev, pager, next, jumper" :total="total"></el-pagination>
+        <el-pagination
+          :currentPage="page"
+          :pageSize="10"
+          layout="total, prev, pager, next, jumper"
+          :total="total"
+          @current-change="handlePageChange"
+        ></el-pagination>
       </div>
     </div>
     <el-dialog title="修改地址" :visible.sync="dialogAddressVisible">
       <el-form :model="nowAddressData">
-        <el-form-item label="所在地区:" label-width="120px"><el-cascader :options="options" placeholder="请选择" v-model="addOptions"></el-cascader></el-form-item>
-        <el-form-item label="详细地址:" label-width="120px">
-          <el-input class="el-input" v-model="nowAddressData.address" auto-complete="off" placeholder="请输入详细地"></el-input>
+        <el-form-item label="所在地区:" labelWidth="120px"><el-cascader v-model="addOptions" :options="options" placeholder="请选择"></el-cascader></el-form-item>
+        <el-form-item label="详细地址:" labelWidth="120px">
+          <el-input v-model="nowAddressData.address" class="el-input" autoComplete="off" placeholder="请输入详细地"></el-input>
         </el-form-item>
-        <el-form-item label="收货人:" label-width="120px">
-          <el-input class="el-input" v-model="nowAddressData.name" auto-complete="off" placeholder="请输入收货人"></el-input>
+        <el-form-item label="收货人:" labelWidth="120px">
+          <el-input v-model="nowAddressData.name" class="el-input" autoComplete="off" placeholder="请输入收货人"></el-input>
         </el-form-item>
-        <el-form-item label="手机:" label-width="120px">
-          <el-input class="el-input" v-model="nowAddressData.mobile" auto-complete="off" placeholder="请输入收货人手机"></el-input>
+        <el-form-item label="手机:" labelWidth="120px">
+          <el-input v-model="nowAddressData.mobile" class="el-input" autoComplete="off" placeholder="请输入收货人手机"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -171,10 +177,10 @@
 </template>
 
 <script>
-import api from '@/config/api'
-
+// import api from '@/config/api'
 export default {
-  data () {
+  components: {},
+  data() {
     return {
       loginInfo: null,
       page: 1,
@@ -205,8 +211,19 @@ export default {
       forlist: [11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
     }
   },
+  mounted() {
+    this.infoForm.id = this.$route.query.id || 0
+    this.getInfo()
+    this.getOrder()
+    this.datainfo()
+    this.getAllRegion()
+    // this.root = api.rootUrl;
+    if (!this.loginInfo) {
+      this.loginInfo = JSON.parse(window.localStorage.getItem('userInfo') || null)
+    }
+  },
   methods: {
-    saveAddress () {
+    saveAddress() {
       this.nowAddressData.addOptions = this.addOptions
       this.axios.post('user/saveaddress', this.nowAddressData).then(response => {
         if (response.data.errno === 0) {
@@ -225,37 +242,39 @@ export default {
         }
       })
     },
-    addressEdit (item) {
+    addressEdit(item) {
       this.nowAddressData = item
       this.addOptions.push(item.province_id, item.city_id, item.district_id)
 
       this.dialogAddressVisible = true
     },
-    viewDetail (index) {
+    viewDetail(index) {
       this.$router.push({ name: 'order_detail', query: { order_sn: index } })
     },
-    handleClick (tab, event) {
+    handleClick(tab) {
       const pindex = tab._data.index
       this.page = 1
       this.total = 0
-      if (pindex == 0) {
+      if (+pindex === 0) {
         this.pIndex = 0
         this.getOrder()
-      } else if (pindex == 1) {
+      } else if (+pindex === 1) {
         this.pIndex = 1
         this.getAddress()
-      } else if (pindex == 2) {
+      } else if (+pindex === 2) {
         this.pIndex = 2
         this.getCartData()
-      } else if (pindex == 3) {
+      } else if (+pindex === 3) {
         this.pIndex = 3
         this.getFootData()
       }
     },
-    submitNick (index, row) {
-      this.axios.post('user/updateInfo', { id: row.id, nickname: row.nickname }).then(response => {})
+    submitNick(index, row) {
+      this.axios.post('user/updateInfo', { id: row.id, nickname: row.nickname }).then(response => {
+        console.log(response)
+      })
     },
-    submitName (index, row) {
+    submitName(index, row) {
       this.axios.post('user/updateName', { id: row.id, name: row.name }).then(response => {
         if (response.data.errno === 0) {
           this.$message({
@@ -270,7 +289,7 @@ export default {
         }
       })
     },
-    submitMobile (index, row) {
+    submitMobile(index, row) {
       this.axios.post('user/updateMobile', { id: row.id, mobile: row.mobile }).then(response => {
         if (response.data.errno === 0) {
           this.$message({
@@ -285,25 +304,25 @@ export default {
         }
       })
     },
-    handlePageChange (val) {
+    handlePageChange(val) {
       this.page = val
       // 保存到localStorage
       localStorage.setItem('thisPage', this.page)
       const pindex = this.pIndex
-      if (pindex == 0) {
+      if (+pindex === 0) {
         this.getOrder()
-      } else if (pindex == 1) {
+      } else if (+pindex === 1) {
         this.getAddress()
-      } else if (pindex == 2) {
+      } else if (+pindex === 2) {
         this.getCartData()
-      } else if (pindex == 3) {
+      } else if (+pindex === 3) {
         this.getFootData()
       }
     },
-    goBackPage () {
+    goBackPage() {
       this.$router.go(-1)
     },
-    datainfo () {
+    datainfo() {
       if (this.infoForm.id <= 0) {
         return false
       }
@@ -319,7 +338,7 @@ export default {
           this.dataInfo = info
         })
     },
-    getInfo () {
+    getInfo() {
       if (this.infoForm.id <= 0) {
         return false
       }
@@ -335,7 +354,7 @@ export default {
           this.userData.push(info)
         })
     },
-    getOrder () {
+    getOrder() {
       if (this.infoForm.id <= 0) {
         return false
       }
@@ -353,7 +372,7 @@ export default {
           this.total = response.data.data.count
         })
     },
-    getAddress () {
+    getAddress() {
       if (this.infoForm.id <= 0) {
         return false
       }
@@ -371,7 +390,7 @@ export default {
           this.total = response.data.data.count
         })
     },
-    getCartData () {
+    getCartData() {
       if (this.infoForm.id <= 0) {
         return false
       }
@@ -389,7 +408,7 @@ export default {
           this.total = response.data.data.count
         })
     },
-    getFootData () {
+    getFootData() {
       if (this.infoForm.id <= 0) {
         return false
       }
@@ -407,23 +426,10 @@ export default {
           this.total = response.data.data.count
         })
     },
-    getAllRegion () {
-      const that = this
+    getAllRegion() {
       this.axios.get('order/getAllRegion').then(response => {
         this.options = response.data.data
       })
-    }
-  },
-  components: {},
-  mounted () {
-    this.infoForm.id = this.$route.query.id || 0
-    this.getInfo()
-    this.getOrder()
-    this.datainfo()
-    this.getAllRegion()
-    // this.root = api.rootUrl;
-    if (!this.loginInfo) {
-      this.loginInfo = JSON.parse(window.localStorage.getItem('userInfo') || null)
     }
   }
 }

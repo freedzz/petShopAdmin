@@ -18,7 +18,15 @@
           <el-table-column label="操作" width="180">
             <template slot-scope="scope">
               <el-button size="small" @click="handleRowEdit(scope.$index, scope.row)">编辑</el-button>
-              <el-button v-if="scope.row.id != loginInfo.id" plain size="small" type="danger" @click="handleRowDelete(scope.$index, scope.row)">删除</el-button>
+              <el-button
+                v-if="scope.row.id != loginInfo.id"
+                plain
+                size="small"
+                type="danger"
+                @click="handleRowDelete(scope.$index, scope.row)"
+              >
+                删除
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -29,7 +37,8 @@
 
 <script>
 export default {
-  data () {
+  components: {},
+  data() {
     return {
       page: 1,
       total: 0,
@@ -40,11 +49,17 @@ export default {
       loginInfo: null
     }
   },
+  mounted() {
+    this.getList()
+    if (!this.loginInfo) {
+      this.loginInfo = JSON.parse(window.localStorage.getItem('userInfo') || null)
+    }
+  },
   methods: {
-    handleRowEdit (index, row) {
+    handleRowEdit(index, row) {
       this.$router.push({ name: 'admin_add', query: { id: row.id } })
     },
-    handleRowDelete (index, row) {
+    handleRowDelete(index, row) {
       console.log(row)
       this.$confirm('确定要删除?', '提示', {
         confirmButtonText: '确定',
@@ -63,22 +78,15 @@ export default {
         })
       })
     },
-    onSubmitFilter () {
+    onSubmitFilter() {
       this.page = 1
       this.getList()
     },
-    getList () {
+    getList() {
       this.axios.get('admin').then(response => {
         this.tableData = response.data.data
         console.log(this.tableData)
       })
-    }
-  },
-  components: {},
-  mounted () {
-    this.getList()
-    if (!this.loginInfo) {
-      this.loginInfo = JSON.parse(window.localStorage.getItem('userInfo') || null)
     }
   }
 }

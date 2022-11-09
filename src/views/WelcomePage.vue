@@ -6,7 +6,7 @@
     <div class="content-main clearfix">
       <div class="notice">
         <div class="l">本演示后台数据为演示数据，可以随意操作，系统每5分钟重置一次</div>
-        <div class="r" v-if="resetVision">
+        <div v-if="resetVision" class="r">
           <label>重置倒计时：</label>
           <countdown class="count" endTime="" :callback="callback" endText="已经结束了"></countdown>
         </div>
@@ -36,7 +36,7 @@
         </el-card>
       </div>
       <div class="main">
-        <el-tabs class="o-tab" v-model="activeName2" type="card" @tab-click="handleClick">
+        <el-tabs v-model="activeName2" class="o-tab" type="card" @tab-click="handleClick">
           <el-tab-pane label="今天" name="first"></el-tab-pane>
           <el-tab-pane label="昨天" name="second"></el-tab-pane>
           <el-tab-pane label="最近7天" name="third"></el-tab-pane>
@@ -46,15 +46,21 @@
           <el-card class="box-card2">
             <div slot="header" class="clearfix">
               <span style="line-height: 36px;">顾客</span>
-              <el-popover placement="right" v-model="related_pop">
-                <el-tabs class="user-tab" v-model="userTab" type="card" @tab-click="userTabClick">
+              <el-popover v-model="related_pop" placement="right">
+                <el-tabs v-model="userTab" class="user-tab" type="card" @tab-click="userTabClick">
                   <el-tab-pane label="新增" name="first"></el-tab-pane>
                   <el-tab-pane label="老客户" name="second"></el-tab-pane>
                 </el-tabs>
-                <el-table :data="userData" style="width: 100%" height="550" border stripe>
+                <el-table
+                  :data="userData"
+                  style="width: 100%"
+                  height="550"
+                  border
+                  stripe
+                >
                   <el-table-column label="头像" width="80">
                     <template slot-scope="scope">
-                      <img :src="scope.row.avatar" alt="" style="width: 50px;height: 50px" />
+                      <img :src="scope.row.avatar" alt="" style="width: 50px;height: 50px">
                     </template>
                   </el-table-column>
                   <el-table-column prop="nickname" label="昵称" width="140"></el-table-column>
@@ -66,7 +72,15 @@
                   <el-table-column prop="register_time" label="注册时间" width="170"></el-table-column>
                   <el-table-column prop="last_login_time" label="最近登录" width="170"></el-table-column>
                 </el-table>
-                <el-button class="float-right" slot="reference" size="mini" type="primary" @click="seeClick">查看</el-button>
+                <el-button
+                  slot="reference"
+                  class="float-right"
+                  size="mini"
+                  type="primary"
+                  @click="seeClick"
+                >
+                  查看
+                </el-button>
               </el-popover>
             </div>
             <div class="text item">
@@ -141,6 +155,15 @@
 import Countdown from './Common/Countdown'
 import { getInfo, getMainInfo } from '@/api/welcome/welcome'
 export default {
+  components: {
+    Countdown
+  },
+  filters: {
+    numFilter (value) {
+      const realVal = Number(value).toFixed(2)
+      return Number(realVal)
+    }
+  },
   data () {
     return {
       dialogVisible: false,
@@ -158,6 +181,14 @@ export default {
       resetVision: true
     }
   },
+  mounted () {
+    this.getInfo()
+    this.getMainInfo(0)
+    if (!this.loginInfo) {
+      this.loginInfo = JSON.parse(window.localStorage.getItem('userInfo') || null)
+      this.username = this.loginInfo.username
+    }
+  },
   methods: {
     callback () {
       this.resetVision = false
@@ -171,7 +202,7 @@ export default {
         this.infoData = res.data
       }
     },
-    handleClick (tab, event) {
+    handleClick (tab) {
       this.related_pop = false
       this.userTab = 'first'
       console.log(tab._data.index)
@@ -179,7 +210,7 @@ export default {
       console.log('pindex:' + pindex)
       this.getMainInfo(pindex)
     },
-    userTabClick (tab, event) {
+    userTabClick (tab) {
       const pindex = tab._data.index
       if (+pindex === 0) {
         this.userData = this.newData
@@ -197,23 +228,6 @@ export default {
         this.oldData = res.data.oldData
         this.userData = this.newData
       }
-    }
-  },
-  components: {
-    Countdown
-  },
-  mounted () {
-    this.getInfo()
-    this.getMainInfo(0)
-    if (!this.loginInfo) {
-      this.loginInfo = JSON.parse(window.localStorage.getItem('userInfo') || null)
-      this.username = this.loginInfo.username
-    }
-  },
-  filters: {
-    numFilter (value) {
-      const realVal = Number(value).toFixed(2)
-      return Number(realVal)
     }
   }
 }

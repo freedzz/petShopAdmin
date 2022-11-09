@@ -15,7 +15,7 @@
           <el-table-column prop="id" label="ID" width="60"></el-table-column>
           <el-table-column label="头像" width="80">
             <template slot-scope="scope">
-              <img :src="scope.row.avatar" alt="" style="width: 50px;height: 50px" />
+              <img :src="scope.row.avatar" alt="" style="width: 50px;height: 50px">
             </template>
           </el-table-column>
           <!--<el-table-column prop="username" label="会员名称">-->
@@ -44,11 +44,11 @@
       <div class="page-box">
         <el-pagination
           background
-          @current-change="handlePageChange"
-          :current-page.sync="page"
-          :page-size="10"
+          :currentPage.sync="page"
+          :pageSize="10"
           layout="total, prev, pager, next, jumper"
           :total="total"
+          @current-change="handlePageChange"
         ></el-pagination>
       </div>
     </div>
@@ -57,7 +57,8 @@
 
 <script>
 export default {
-  data () {
+  components: {},
+  data() {
     return {
       page: 1,
       total: 0,
@@ -69,20 +70,31 @@ export default {
       username: ''
     }
   },
+  mounted() {
+    let thePage = localStorage.getItem('userPage')
+    if (!thePage) {
+      thePage = 1
+    }
+    this.page = Number(thePage)
+    console.log(this.page)
+    this.getList()
+  },
   methods: {
-    submitNick (index, row) {
-      this.axios.post('user/updateInfo', { id: row.id, nickname: row.nickname }).then(response => {})
+    submitNick(index, row) {
+      this.axios.post('user/updateInfo', { id: row.id, nickname: row.nickname }).then(response => {
+        console.log(response)
+      })
     },
-    handlePageChange (val) {
+    handlePageChange(val) {
       this.page = val
       // 保存到localStorage
       localStorage.setItem('userPage', this.page)
       this.getList()
     },
-    handleRowEdit (index, row) {
+    handleRowEdit(index, row) {
       this.$router.push({ name: 'user_add', query: { id: row.id } })
     },
-    handleRowDelete (index, row) {
+    handleRowDelete(index, row) {
       this.$confirm('确定要删除?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -101,11 +113,11 @@ export default {
         })
       })
     },
-    onSubmitFilter () {
+    onSubmitFilter() {
       this.page = 1
       this.getList()
     },
-    getList () {
+    getList() {
       this.axios
         .get('user', {
           params: {
@@ -125,16 +137,6 @@ export default {
         this.username = this.loginInfo.username
       }
     }
-  },
-  components: {},
-  mounted () {
-    let thePage = localStorage.getItem('userPage')
-    if (thePage == null) {
-      thePage = 1
-    }
-    this.page = Number(thePage)
-    console.log(this.page)
-    this.getList()
   }
 }
 </script>

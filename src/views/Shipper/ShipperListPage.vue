@@ -6,8 +6,8 @@
         <el-breadcrumb-item>快递列表</el-breadcrumb-item>
       </el-breadcrumb>
       <div class="operation-nav">
-        <el-button plain type="primary" @click="addShipper" icon="arrow-left">添加快递</el-button>
-        <el-button @click="goBackPage" icon="arrow-left">返回</el-button>
+        <el-button plain type="primary" icon="arrow-left" @click="addShipper">添加快递</el-button>
+        <el-button icon="arrow-left" @click="goBackPage">返回</el-button>
       </div>
     </div>
     <div class="content-main">
@@ -25,12 +25,12 @@
           <el-table-column prop="sort_order" label="排序" width="220">
             <template slot-scope="scope">
               <el-input-number
+                v-model="scope.row.sort_order"
                 class="sort-width"
                 size="mini"
                 :min="1"
                 :max="100"
-                controls-position="right"
-                v-model="scope.row.sort_order"
+                controlsPosition="right"
                 placeholder="排序"
                 @blur="submitSort(scope.$index, scope.row)"
                 @change="submitSort(scope.$index, scope.row)"
@@ -39,7 +39,7 @@
           </el-table-column>
           <el-table-column label="使用" width="80">
             <template slot-scope="scope">
-              <el-switch v-model="scope.row.enabled" active-text="" inactive-text="" @change="changeStatus($event, scope.row.id)"></el-switch>
+              <el-switch v-model="scope.row.enabled" activeText="" inactiveText="" @change="changeStatus($event, scope.row.id)"></el-switch>
             </template>
           </el-table-column>
           <el-table-column label="操作">
@@ -51,7 +51,13 @@
         </el-table>
       </div>
       <div class="page-box">
-        <el-pagination @current-change="handlePageChange" :current-page="page" :page-size="10" layout="total, prev, pager, next, jumper" :total="total"></el-pagination>
+        <el-pagination
+          :currentPage="page"
+          :pageSize="10"
+          layout="total, prev, pager, next, jumper"
+          :total="total"
+          @current-change="handlePageChange"
+        ></el-pagination>
       </div>
     </div>
   </div>
@@ -59,7 +65,8 @@
 
 <script>
 export default {
-  data () {
+  components: {},
+  data() {
     return {
       page: 1,
       total: 0,
@@ -69,27 +76,32 @@ export default {
       tableData: []
     }
   },
+  mounted() {
+    this.getList()
+  },
   methods: {
-    submitSort (index, row) {
-      this.axios.post('shipper/updateSort', { id: row.id, sort: row.sort_order }).then(response => {})
+    submitSort(index, row) {
+      this.axios.post('shipper/updateSort', { id: row.id, sort: row.sort_order }).then(response => {
+        console.log(response)
+      })
     },
-    goBackPage () {
+    goBackPage() {
       this.$router.go(-1)
     },
-    handlePageChange (val) {
+    handlePageChange(val) {
       this.page = val
       // 保存到localStorage
       localStorage.setItem('shipperPage', this.page)
       localStorage.setItem('shipperFilterForm', JSON.stringify(this.filterForm))
       this.getList()
     },
-    addShipper () {
+    addShipper() {
       this.$router.push({ name: 'shipper_add', query: { id: 0 } })
     },
-    handleRowEdit (index, row) {
+    handleRowEdit(index, row) {
       this.$router.push({ name: 'shipper_add', query: { id: row.id } })
     },
-    handleRowDelete (index, row) {
+    handleRowDelete(index, row) {
       this.$confirm('确定要删除?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -107,11 +119,11 @@ export default {
         })
       })
     },
-    onSubmitFilter () {
+    onSubmitFilter() {
       this.page = 1
       this.getList()
     },
-    getList () {
+    getList() {
       this.axios
         .get('shipper/list', {
           params: {
@@ -129,7 +141,7 @@ export default {
           }
         })
     },
-    changeStatus ($event, para) {
+    changeStatus($event, para) {
       this.axios
         .get('shipper/enabledStatus', {
           params: {
@@ -137,17 +149,13 @@ export default {
             id: para
           }
         })
-        .then(response => {
+        .then(() => {
           this.$message({
             type: 'success',
             message: '更新成功!'
           })
         })
     }
-  },
-  components: {},
-  mounted () {
-    this.getList()
   }
 }
 </script>

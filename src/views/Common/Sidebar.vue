@@ -1,8 +1,15 @@
 <template>
   <div class="left-box">
-    <div class="logo"><img src="@/assets/img/loading2.gif" /></div>
+    <div class="logo"><img src="@/assets/img/loading2.gif"></div>
     <div class="a" style="overflow-x: hidden;overflow-y: scroll;height: 100%;">
-      <el-menu class="sidebar" :unique-opened="true" :default-active="currentPagePath" @open="handleOpen" :router="true" @close="handleClose">
+      <el-menu
+        class="sidebar"
+        :uniqueOpened="true"
+        :defaultActive="currentPagePath"
+        :router="true"
+        @open="handleOpen"
+        @close="handleClose"
+      >
         <el-menu-item index="/dashboard/welcome">
           <i class="fa fa-tachometer"></i>
           <span>后台主页</span>
@@ -74,20 +81,27 @@
 
 <script>
 export default {
-  data () {
+  data() {
     return {
       currentPagePath: '/dashboard',
       loginInfo: null
     }
   },
+  mounted() {
+    console.log(this.$route.path)
+    this.checkLogin()
+    if (!this.loginInfo) {
+      this.loginInfo = JSON.parse(window.localStorage.getItem('userInfo') || null)
+    }
+  },
   methods: {
-    handleOpen (key, keyPath) {
+    handleOpen(key, keyPath) {
       console.log(key, keyPath)
     },
-    handleClose (key, keyPath) {
+    handleClose(key, keyPath) {
       console.log(key, keyPath)
     },
-    logout () {
+    logout() {
       this.$confirm('是否要退出?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -97,7 +111,7 @@ export default {
         this.$router.replace({ name: 'login' })
       })
     },
-    checkLogin () {
+    checkLogin() {
       this.axios.get('index/checkLogin').then(response => {
         console.log(response.data)
         if (response.data.errno === 401) {
@@ -105,13 +119,6 @@ export default {
           this.$router.replace({ name: 'login' })
         }
       })
-    }
-  },
-  mounted () {
-    console.log(this.$route.path)
-    this.checkLogin()
-    if (!this.loginInfo) {
-      this.loginInfo = JSON.parse(window.localStorage.getItem('userInfo') || null)
     }
   }
 }

@@ -12,7 +12,7 @@
           <el-table-column prop="id" label="ID" width="70px"></el-table-column>
           <el-table-column prop="image_url" label="广告">
             <template slot-scope="scope">
-              <img :src="scope.row.image_url" alt="" style="width: 90px;height: 50px" />
+              <img :src="scope.row.image_url" alt="" style="width: 90px;height: 50px">
             </template>
           </el-table-column>
           <el-table-column prop="goods_id" label="关联商品"></el-table-column>
@@ -29,7 +29,7 @@
           </el-table-column>
           <el-table-column label="开启状态" width="80">
             <template slot-scope="scope">
-              <el-switch v-model="scope.row.enabled" active-text="" inactive-text="" @change="changeStatus($event, scope.row.id)"></el-switch>
+              <el-switch v-model="scope.row.enabled" activeText="" inactiveText="" @change="changeStatus($event, scope.row.id)"></el-switch>
             </template>
           </el-table-column>
           <el-table-column label="操作" width="170">
@@ -41,7 +41,13 @@
         </el-table>
       </div>
       <div class="page-box">
-        <el-pagination @current-change="handlePageChange" :current-page="page" :page-size="10" layout="total, prev, pager, next, jumper" :total="total"></el-pagination>
+        <el-pagination
+          :currentPage="page"
+          :pageSize="10"
+          layout="total, prev, pager, next, jumper"
+          :total="total"
+          @current-change="handlePageChange"
+        ></el-pagination>
       </div>
     </div>
   </div>
@@ -49,7 +55,8 @@
 
 <script>
 export default {
-  data () {
+  components: {},
+  data() {
     return {
       page: 1,
       total: 0,
@@ -59,14 +66,17 @@ export default {
       tableData: []
     }
   },
+  mounted() {
+    this.getList()
+  },
   methods: {
-    test () {
+    test() {
       console.log(this.tableData)
     },
-    submitSort (index, row) {
-      this.axios.post('ad/updateSort', { id: row.id, sort: row.sort_order }).then(response => {})
+    submitSort(index, row) {
+      this.axios.post('ad/updateSort', { id: row.id, sort: row.sort_order })
     },
-    changeStatus ($event, para) {
+    changeStatus($event, para) {
       this.axios
         .get('ad/saleStatus', {
           params: {
@@ -74,19 +84,18 @@ export default {
             id: para
           }
         })
-        .then(response => {})
     },
-    handlePageChange (val) {
+    handlePageChange(val) {
       this.page = val
       // 保存到localStorage
       localStorage.setItem('adPage', this.page)
       localStorage.setItem('adFilterForm', JSON.stringify(this.filterForm))
       this.getList()
     },
-    handleRowEdit (index, row) {
+    handleRowEdit(index, row) {
       this.$router.push({ name: 'ad_add', query: { id: row.id } })
     },
-    handleRowDelete (index, row) {
+    handleRowDelete(index, row) {
       this.$confirm('确定要删除?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -105,11 +114,11 @@ export default {
         })
       })
     },
-    onSubmitFilter () {
+    onSubmitFilter() {
       this.page = 1
       this.getList()
     },
-    getList () {
+    getList() {
       this.axios
         .get('ad', {
           params: {
@@ -123,10 +132,6 @@ export default {
         })
       console.log(this.tableData)
     }
-  },
-  components: {},
-  mounted () {
-    this.getList()
   }
 }
 </script>

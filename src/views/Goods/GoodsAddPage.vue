@@ -8,42 +8,42 @@
       <div class="operation-nav">
         <!-- <el-button type="primary" @click="test">测试</el-button> -->
         <el-button type="primary" @click="onSubmitInfo">确定保存</el-button>
-        <el-button @click="goBackPage" icon="arrow-left">返回列表</el-button>
+        <el-button icon="arrow-left" @click="goBackPage">返回列表</el-button>
       </div>
     </div>
     <div class="content-main">
       <div class="form-table-box">
-        <el-form ref="infoForm" :rules="infoRules" :model="infoForm" label-width="120px">
+        <el-form ref="infoForm" :rules="infoRules" :model="infoForm" labelWidth="120px">
           <el-form-item label="商品分类">
-            <el-select class="el-select-class" v-model="cateId" placeholder="选择型号分类">
+            <el-select v-model="cateId" class="el-select-class" placeholder="选择型号分类">
               <el-option v-for="item in cateOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="商品图片" prop="list_pic_url" v-if="infoForm.list_pic_url" class="image-uploader-diy new-height">
+          <el-form-item v-if="infoForm.list_pic_url" label="商品图片" prop="list_pic_url" class="image-uploader-diy new-height">
             <div class="index-image">
               <el-image
-                :preview-src-list="previewList"
                 v-if="infoForm.list_pic_url"
+                :previewSrcList="previewList"
                 :src="infoForm.list_pic_url"
-                @click="previewIndexImg"
                 class="image-show"
                 fit="cover"
+                @click="previewIndexImg"
               ></el-image>
               <div class="o-shadow" @click="delePicList"><i class="el-icon-delete"></i></div>
             </div>
           </el-form-item>
-          <el-form-item label="商品图片" prop="list_pic_url" v-if="!infoForm.list_pic_url">
+          <el-form-item v-if="!infoForm.list_pic_url" label="商品图片" prop="list_pic_url">
             <el-upload
-              name="file"
               ref="upload"
+              name="file"
               class="upload-demo"
               :action="qiniuZone"
-              :on-success="handleSuccess"
-              :before-upload="indexImgBefore"
-              :auto-upload="true"
-              list-type="picture-card"
+              :onSuccess="handleSuccess"
+              :beforeUpload="indexImgBefore"
+              :autoUpload="true"
+              listType="picture-card"
               :data="picData"
-              :http-request="uploadIndexImg"
+              :httpRequest="uploadIndexImg"
             >
               <el-button size="small" type="primary">点击上传</el-button>
               <div slot="tip" class="el-upload__tip">只能上传jpg/png文件</div>
@@ -51,32 +51,32 @@
           </el-form-item>
           <el-form-item label="商品轮播图" prop="goods_sn">
             <draggable v-model="gallery_list" draggable=".gallery-item" class="drag-wrap">
-              <div v-for="(element, index) in gallery_list" class="gallery-item" v-if="element.is_delete == 0">
+              <div v-for="(element, index) in gallery_list" v-show="element.is_delete === 0" :key="index" class="gallery-item">
                 <el-image
-                  :preview-src-list="previewList"
-                  @click="previewImg(index)"
+                  :previewSrcList="previewList"
                   style="width: 148px; height: 148px;margin:0 10px 10px 0;"
                   :src="element.url"
                   fit="cover"
+                  @click="previewImg(index)"
                 ></el-image>
                 <div class="shadow" @click="onRemoveHandler(index)"><i class="el-icon-delete"></i></div>
               </div>
               <el-upload
-                name="file"
                 ref="upload"
-                :on-remove="galleryRemove"
+                name="file"
+                :onRemove="galleryRemove"
                 class="upload-demo"
                 :action="qiniuZone"
-                :on-preview="galleryPreview"
-                :show-file-list="false"
+                :onPreview="galleryPreview"
+                :showFileList="false"
                 :data="picData"
-                :before-upload="galleryBefore"
-                :on-error="hasErrorAct"
-                :on-success="handleSuccess"
-                :auto-upload="true"
+                :beforeUpload="galleryBefore"
+                :onError="hasErrorAct"
+                :onSuccess="handleSuccess"
+                :autoUpload="true"
                 multiple
-                list-type="picture-card"
-                :http-request="uploadGalleryImg"
+                listType="picture-card"
+                :httpRequest="uploadGalleryImg"
               >
                 <i class="el-icon-plus"></i>
               </el-upload>
@@ -84,7 +84,7 @@
           </el-form-item>
           <el-form-item label="商品名称" prop="name"><el-input v-model="infoForm.name"></el-input></el-form-item>
           <el-form-item label="商品简介" prop="goods_brief">
-            <el-input type="textarea" v-model="infoForm.goods_brief" :rows="3"></el-input>
+            <el-input v-model="infoForm.goods_brief" type="textarea" :rows="3"></el-input>
             <div class="form-tip"></div>
           </el-form-item>
           <el-form-item label="商品单位" prop="goods_unit">
@@ -94,7 +94,7 @@
           <el-form-item label="销量" prop="sell_volume"><el-input v-model="infoForm.sell_volume"></el-input></el-form-item>
           <el-form-item label="型号和价格">
             <div>
-              <el-select class="el-select-class" v-model="specValue" placeholder="选择型号分类">
+              <el-select v-model="specValue" class="el-select-class" placeholder="选择型号分类">
                 <el-option v-for="item in specOptionsList" :key="item.value" :label="item.label" :value="item.value"></el-option>
               </el-select>
             </div>
@@ -102,42 +102,48 @@
               <el-table :data="specData" stripe style="width: 100%">
                 <el-table-column prop="goods_sn" label="商品SKU" width="140">
                   <template slot-scope="scope">
-                    <el-input @blur="checkSkuOnly(scope.$index, scope.row)" size="mini" v-model="scope.row.goods_sn" placeholder="商品SKU"></el-input>
+                    <el-input v-model="scope.row.goods_sn" size="mini" placeholder="商品SKU" @blur="checkSkuOnly(scope.$index, scope.row)"></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column prop="goods_aka" label="快递单上的简称" width="160">
                   <template slot-scope="scope">
-                    <el-input size="mini" v-model="scope.row.goods_name" placeholder="简称"></el-input>
+                    <el-input v-model="scope.row.goods_name" size="mini" placeholder="简称"></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column prop="value" label="型号/规格" width="130">
                   <template slot-scope="scope">
-                    <el-input size="mini" v-model="scope.row.value" placeholder="如1斤/条"></el-input>
+                    <el-input v-model="scope.row.value" size="mini" placeholder="如1斤/条"></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column prop="cost" label="成本(元)" width="100">
                   <template slot-scope="scope">
-                    <el-input size="mini" v-model="scope.row.cost" placeholder="成本"></el-input>
+                    <el-input v-model="scope.row.cost" size="mini" placeholder="成本"></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column prop="retail_price" label="零售(元)" width="100">
                   <template slot-scope="scope">
-                    <el-input size="mini" v-model="scope.row.retail_price" placeholder="零售"></el-input>
+                    <el-input v-model="scope.row.retail_price" size="mini" placeholder="零售"></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column prop="goods_weight" label="重量(KG)" width="100">
                   <template slot-scope="scope">
-                    <el-input size="mini" v-model="scope.row.goods_weight" placeholder="重量"></el-input>
+                    <el-input v-model="scope.row.goods_weight" size="mini" placeholder="重量"></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column prop="goods_number" label="库存" width="100">
                   <template slot-scope="scope">
-                    <el-input size="mini" v-model="scope.row.goods_number" placeholder="库存"></el-input>
+                    <el-input v-model="scope.row.goods_number" size="mini" placeholder="库存"></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column label="操作" width="70">
                   <template slot-scope="scope">
-                    <el-button size="mini" type="danger" icon="el-icon-delete" circle @click="specDelete(scope.$index, scope.row)"></el-button>
+                    <el-button
+                      size="mini"
+                      type="danger"
+                      icon="el-icon-delete"
+                      circle
+                      @click="specDelete(scope.$index, scope.row)"
+                    ></el-button>
                   </template>
                 </el-table-column>
               </el-table>
@@ -152,13 +158,21 @@
               <el-option v-for="item in kdOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="排序" prop="sort_order"><el-input-number :mini="1" :max="100" v-model="infoForm.sort_order"></el-input-number></el-form-item>
-          <el-form-item label=" "><el-switch active-text="上架" inactive-text="下架" active-value="1" inactive-value="0" v-model="infoForm.is_on_sale"></el-switch></el-form-item>
+          <el-form-item label="排序" prop="sort_order"><el-input-number v-model="infoForm.sort_order" :mini="1" :max="100"></el-input-number></el-form-item>
+          <el-form-item label=" ">
+            <el-switch
+              v-model="infoForm.is_on_sale"
+              activeText="上架"
+              inactiveText="下架"
+              activeValue="1"
+              inactiveValue="0"
+            ></el-switch>
+          </el-form-item>
           <el-form-item label="商品详情" prop="goods_desc">
             <div class="edit_container">
               <quill-editor
-                v-model="infoForm.goods_desc"
                 ref="myTextEditor"
+                v-model="infoForm.goods_desc"
                 class="editer"
                 :options="editorOption"
                 @blur="onEditorBlur($event)"
@@ -173,24 +187,24 @@
               name="file"
               class="avatar-uploader"
               :action="qiniuZone"
-              list-type="picture-card"
-              :file-list="detail_list"
-              :before-upload="beforeUpload"
-              :on-success="handleSuccess"
+              listType="picture-card"
+              :fileList="detail_list"
+              :beforeUpload="beforeUpload"
+              :onSuccess="handleSuccess"
               :data="picData"
               multiple
-              :http-request="uploadDetailsImg"
+              :httpRequest="uploadDetailsImg"
             ></el-upload>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="onSubmitInfo">确定保存</el-button>
             <el-button @click="goBackPage">返回列表</el-button>
-            <el-button type="danger" class="float-right" @click="onCopyGood" v-if="infoForm.id > 0">复制商品</el-button>
+            <el-button v-if="infoForm.id > 0" type="danger" class="float-right" @click="onCopyGood">复制商品</el-button>
           </el-form-item>
         </el-form>
       </div>
     </div>
-    <el-dialog :visible.sync="dialogVisible" size="tiny"><img width="100%" :src="dialogImageUrl" alt="" /></el-dialog>
+    <el-dialog :visible.sync="dialogVisible" size="tiny"><img width="100%" :src="dialogImageUrl" alt=""></el-dialog>
   </div>
 </template>
 
@@ -235,7 +249,13 @@ const toolbarOptions = [
   ['link', 'image', 'video']
 ]
 export default {
-  data () {
+  components: {
+    // ElFormItem,
+    // ElForm,
+    quillEditor,
+    draggable
+  },
+  data() {
     return {
       root: '',
       qiniuZone: '',
@@ -256,7 +276,7 @@ export default {
           toolbar: {
             container: toolbarOptions, // 工具栏
             handlers: {
-              image: function (value) {
+              image: function(value) {
                 if (value) {
                   document.querySelector('.avatar-uploader input').click()
                 } else {
@@ -336,9 +356,30 @@ export default {
       autoFocus: false
     }
   },
+  computed: {
+    editor() {
+      return this.$refs.myTextEditor.quillEditor
+    }
+  },
+  mounted() {
+    this.infoForm.id = this.$route.query.id || 0
+    this.getInfo()
+    this.getAllCategory()
+    this.getExpressData()
+    this.getQiniuToken()
+    this.getAllSpecification()
+    if (this.infoForm.id > 0) {
+      this.getSpecData()
+      this.getGalleryList()
+    }
+    this.root = api.rootUrl
+    this.qiniuZone = api.qiniu
+  },
   methods: {
-    handleSuccess () {},
-    uploadIndexImg (request) {
+    handleSuccess() {
+      console.log(11)
+    },
+    uploadIndexImg(request) {
       const file = request.file
       lrz(file)
         .then(rst => {
@@ -356,11 +397,11 @@ export default {
             this.handleUploadListSuccess(res.data)
           })
         })
-        .catch(function (err) {
+        .catch(function(err) {
           console.log(err)
         })
     },
-    handleUploadListSuccess (res) {
+    handleUploadListSuccess(res) {
       const url = this.url
       this.infoForm.list_pic_url = url + res.key
       console.log(this.infoForm.list_pic_url)
@@ -373,7 +414,7 @@ export default {
           this.infoForm.https_pic_url = lastUrl
         })
     },
-    onRemoveHandler (index) {
+    onRemoveHandler(index) {
       const that = this
       that
         .$confirm('确定删除该图片?', '提示', {
@@ -385,9 +426,8 @@ export default {
           const arr = that.gallery_list
           arr[index].is_delete = 1
         })
-        .catch(() => {})
     },
-    uploadGalleryImg (request) {
+    uploadGalleryImg(request) {
       const file = request.file
       lrz(file)
         .then(rst => {
@@ -405,11 +445,11 @@ export default {
             this.handleUploadGallerySuccess(res.data)
           })
         })
-        .catch(function (err) {
+        .catch(function(err) {
           console.log(err)
         })
     },
-    handleUploadGallerySuccess (res) {
+    handleUploadGallerySuccess(res) {
       const url = this.url
       const urlData = url + res.key
       const data = {
@@ -419,27 +459,27 @@ export default {
       }
       this.gallery_list.push(data)
     },
-    test () {
+    test() {
       console.log(this.gallery_list)
     },
-    previewIndexImg () {
+    previewIndexImg() {
       const that = this
       that.previewList = []
       that.previewList.push(that.infoForm.list_pic_url)
     },
-    previewImg (index) {
+    previewImg(index) {
       const that = this
       that.previewList = []
       const arr = that.gallery_list
       that.previewList.push(arr[index].url)
     },
-    beforeRemove (file, fileList) {
+    beforeRemove(file) {
       return this.$confirm(`确定移除 ${file.name}？`)
     },
-    checkSkuOnly (index, row) {
+    checkSkuOnly(index, row) {
       console.log(index)
       console.log(row)
-      if (row.goods_sn == '') {
+      if (!row.goods_sn) {
         this.$message({
           type: 'error',
           message: 'SKU不能为空'
@@ -464,7 +504,7 @@ export default {
           }
         })
     },
-    getSpecData () {
+    getSpecData() {
       const id = this.infoForm.id
       this.axios
         .post('specification/getGoodsSpec', {
@@ -478,7 +518,7 @@ export default {
           }
         })
     },
-    addSpecData () {
+    addSpecData() {
       const ele = {
         goods_sn: '',
         value: '',
@@ -489,16 +529,16 @@ export default {
       }
       this.specData.push(ele)
     },
-    specDelete (index, row) {
+    specDelete(index) {
       this.specData.splice(index, 1)
     },
-    testCallBack () {
+    testCallBack() {
       console.log(this.specValue)
     },
-    hasErrorAct (err) {
+    hasErrorAct(err) {
       console.log(err)
     },
-    getQiniuToken () {
+    getQiniuToken() {
       const that = this
       this.axios.post('index/getQiniuToken').then(response => {
         const resInfo = response.data.data
@@ -506,20 +546,20 @@ export default {
         that.url = resInfo.url
       })
     },
-    specChange (value) {
+    specChange(value) {
       this.specForm.id = value
     },
-    addPrimarySpec () {
+    addPrimarySpec() {
       this.is_has_spec = true
     },
-    getImgUrl () {
+    getImgUrl() {
       const str = this.infoForm.goods_desc
       // 匹配图片（g表示匹配所有结果i表示区分大小写）
       const imgReg = /<img [^>]*src=['"]([^'"]+)[^>]*>/gi
       // 匹配src属性
       const srcReg = /src=[\'\"]?([^\'\"]*)[\'\"]?/i
       const arr = str.match(imgReg)
-      if (arr == null) {
+      if (!arr) {
         return false
       }
       const data = []
@@ -532,10 +572,10 @@ export default {
       }
       this.detail_list = data
     },
-    submitUpload () {
+    submitUpload() {
       this.$refs.upload.submit()
     },
-    delePicList () {
+    delePicList() {
       const that = this
       that
         .$confirm('确定删除该图片?', '提示', {
@@ -546,25 +586,24 @@ export default {
         .then(() => {
           that.infoForm.list_pic_url = ''
         })
-        .catch(() => {})
     },
-    indexImgBefore (file) {
+    indexImgBefore() {
       this.getQiniuToken()
     },
-    galleryBefore (file) {
+    galleryBefore(file) {
       this.picData.key = new Date().getTime() + Math.floor(Math.random() * 100) + file.name // 自定义图片名
       this.getQiniuToken()
     },
-    galleryRemove (file, fileList) {
+    galleryRemove(file, fileList) {
       console.log(file)
       console.log(fileList)
     },
-    galleryPreview (file) {
+    galleryPreview(file) {
       console.log(file)
       this.dialogImageUrl = file.url
       this.dialogVisible = true
     },
-    getGalleryList () {
+    getGalleryList() {
       const goodsId = this.infoForm.id
       this.axios
         .post('goods/getGalleryList', {
@@ -574,44 +613,44 @@ export default {
           this.gallery_list = response.data.data.galleryData
         })
     },
-    kdChange (kdValue) {
+    kdChange(kdValue) {
       this.infoForm.freight_template_id = kdValue
     },
-    timeChange (val) {
+    timeChange(val) {
       console.log(val)
       // this.infoForm.freight_template_id = kdValue;
     },
-    onEditorReady (editor) {
+    onEditorReady(editor) {
       console.log('editor ready!', editor)
     },
-    onEditorFocus (editor) {
+    onEditorFocus(editor) {
       console.log('editor focus!', editor)
     },
-    onEditorBlur (editor) {
+    onEditorBlur(editor) {
       console.log('editor blur!', editor)
     },
 
-    beforeUpload (file) {
+    beforeUpload() {
       this.getQiniuToken()
       this.quillUpdateImg = true
     },
-    uploadError () {
+    uploadError() {
       // loading动画消失
       this.quillUpdateImg = false
       this.$message.error('图片插入失败')
     },
-    goBackPage () {
+    goBackPage() {
       this.$router.go(-1)
     },
     // 富文本插入网络图片
-    onLinkImageUrl () {
+    onLinkImageUrl() {
       var imageurl = document.querySelector('.url-image-fuzhu input').value
       const quill = this.$refs.myTextEditor.quill
       const length = quill.getSelection().index
       quill.insertEmbed(length, 'image', imageurl)
       quill.setSelection(length + 1)
     },
-    onCopyGood () {
+    onCopyGood() {
       this.$confirm('确定复制该商品？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -633,24 +672,24 @@ export default {
           })
       })
     },
-    onSubmitInfo () {
+    onSubmitInfo() {
       this.$refs.infoForm.validate(valid => {
         if (valid) {
-          if (this.infoForm.list_pic_url == '' || this.infoForm.list_pic_url == null) {
+          if (!this.infoForm.list_pic_url) {
             this.$message({
               type: 'error',
               message: '请上传商品首图！'
             })
             return false
           }
-          if (this.gallery_list.length == 0) {
+          if (this.gallery_list.length === 0) {
             this.$message({
               type: 'error',
               message: '请至少上传一张轮播图！'
             })
             return false
           }
-          if (this.specData.length == 0) {
+          if (this.specData.length === 0) {
             this.$message({
               type: 'error',
               message: '请添加一个规格型号'
@@ -658,7 +697,7 @@ export default {
             return false
           }
           for (const ele of this.specData) {
-            if (ele.cost == '' || ele.goods_sn == '' || ele.goods_weight == '' || ele.retail_price == '' || ele.value == '') {
+            if (ele.cost === '' || ele.goods_sn === '' || ele.goods_weight === '' || ele.retail_price === '' || ele.value === '') {
               this.$message({
                 type: 'error',
                 message: '型号和价格的值不能为空'
@@ -696,7 +735,7 @@ export default {
         }
       })
     },
-    uploadDetailsImg (request) {
+    uploadDetailsImg(request) {
       const file = request.file
       lrz(file)
         .then(rst => {
@@ -714,11 +753,11 @@ export default {
             this.handleUploadDetailSuccess(res.data)
           })
         })
-        .catch(function (err) {
+        .catch(function(err) {
           console.log(err)
         })
     },
-    handleUploadDetailSuccess (res) {
+    handleUploadDetailSuccess(res) {
       const url = this.url
       const data = url + res.key
       const quill = this.$refs.myTextEditor.quill
@@ -733,7 +772,7 @@ export default {
       // loading动画消失
       this.quillUpdateImg = false
     },
-    getInfo () {
+    getInfo() {
       if (this.infoForm.id <= 0) {
         return false
       }
@@ -758,7 +797,7 @@ export default {
         })
     },
     // 获取所有分类
-    getAllCategory () {
+    getAllCategory() {
       const that = this
       this.axios
         .get('goods/getAllCategory', {
@@ -768,7 +807,7 @@ export default {
           that.options = response.data.data
         })
     },
-    getAllSpecification () {
+    getAllSpecification() {
       const that = this
       this.axios.get('goods/getAllSpecification').then(response => {
         const resInfo = response.data.data
@@ -776,7 +815,7 @@ export default {
         that.specOptionsList = resInfo
       })
     },
-    getExpressData () {
+    getExpressData() {
       const that = this
       this.axios
         .get('goods/getExpressData', {
@@ -789,9 +828,11 @@ export default {
         })
     },
     // summernote 上传图片，返回链接
-    sendFile (file) {},
+    sendFile() {
+      console.log('sendFile')
+    },
     // 初始化 summernote
-    initSummerNote () {
+    initSummerNote() {
       const that = this
       $('#summernote').summernote({
         lang: 'zh-CN',
@@ -801,12 +842,12 @@ export default {
         maxHeight: 400,
         focus: true,
         callbacks: {
-          onBlur: function (e) {
+          onBlur: function() {
             console.log(' on blur ')
             console.log($('#summernote').summernote('code'))
             that.infoForm.goods_desc = $('#summernote').summernote('code')
           },
-          onImageUpload: function (files) {
+          onImageUpload: function(files) {
             console.log('onImageUpLoad...')
             that.sendFile(files[0])
           }
@@ -815,31 +856,6 @@ export default {
       // console.error(that.infoForm.goods_desc);
       $('#summernote').summernote('code', that.infoForm.goods_desc)
     }
-  },
-  components: {
-    // ElFormItem,
-    // ElForm,
-    quillEditor,
-    draggable
-  },
-  computed: {
-    editor () {
-      return this.$refs.myTextEditor.quillEditor
-    }
-  },
-  mounted () {
-    this.infoForm.id = this.$route.query.id || 0
-    this.getInfo()
-    this.getAllCategory()
-    this.getExpressData()
-    this.getQiniuToken()
-    this.getAllSpecification()
-    if (this.infoForm.id > 0) {
-      this.getSpecData()
-      this.getGalleryList()
-    }
-    this.root = api.rootUrl
-    this.qiniuZone = api.qiniu
   }
 }
 </script>

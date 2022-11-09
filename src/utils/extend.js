@@ -1,10 +1,21 @@
-import { loadingText, messageDuration, title } from '@/config'
+import {
+  loadingText,
+  messageDuration,
+  title
+} from '@/config'
 import * as lodash from 'lodash'
-import { Loading, Message, MessageBox, Notification } from 'element-ui'
+import {
+  Loading,
+  Message,
+  MessageBox,
+  Notification
+} from 'element-ui'
 // import store from '@/store'
-import { getAccessToken } from '@/utils/accessToken'
+import {
+  getAccessToken
+} from '@/utils/accessToken'
 
-const install = (Vue, opts = {}) => {
+const install = (Vue) => {
   /* 全局accessToken */
   Vue.prototype.$baseAccessToken = () => {
     return getAccessToken()
@@ -43,24 +54,28 @@ const install = (Vue, opts = {}) => {
         background: 'hsla(0,0%,100%,.8)'
       })
     } else {
+      let indexStr = ''
       switch (index) {
-        case 1:
-          index = 'dots'
-          break
-        case 2:
-          index = 'gauge'
-          break
-        case 3:
-          index = 'inner-circles'
-          break
-        case 4:
-          index = 'plus'
-          break
+      case 1:
+        indexStr = 'dots'
+        break
+      case 2:
+        indexStr = 'gauge'
+        break
+      case 3:
+        indexStr = 'inner-circles'
+        break
+      case 4:
+        indexStr = 'plus'
+        break
+      default:
+        indexStr = 'dots'
+        break
       }
       loading = Loading.service({
         lock: true,
         text: text || loadingText,
-        spinner: index + '-loader',
+        spinner: indexStr + '-loader',
         background: 'hsla(0,0%,100%,.8)'
       })
     }
@@ -82,7 +97,7 @@ const install = (Vue, opts = {}) => {
     MessageBox.alert(content, title || '温馨提示', {
       confirmButtonText: '确定',
       dangerouslyUseHTMLString: true,
-      callback: (action) => {
+      callback: () => {
         if (callback) {
           callback()
         }

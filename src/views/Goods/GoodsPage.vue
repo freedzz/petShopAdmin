@@ -9,9 +9,27 @@
     <div class="content-main">
       <div class="block">
         <span class="wrapper">
-          <el-button :plain="true" type="primary" :class="activeClass == 1 ? 'active' : ''" @click="sortOrder(1)" size="small">按销量排序</el-button>
-          <el-button :plain="true" type="primary" :class="activeClass == 2 ? 'active' : ''" @click="sortOrder(2)" size="small">按售价排序</el-button>
-          <el-button :plain="true" type="primary" :class="activeClass == 3 ? 'active' : ''" @click="sortOrder(3)" size="small">按库存排序</el-button>
+          <el-button
+            :plain="true"
+            type="primary"
+            :class="activeClass == 1 ? 'active' : ''"
+            size="small"
+            @click="sortOrder(1)"
+          >按销量排序</el-button>
+          <el-button
+            :plain="true"
+            type="primary"
+            :class="activeClass == 2 ? 'active' : ''"
+            size="small"
+            @click="sortOrder(2)"
+          >按售价排序</el-button>
+          <el-button
+            :plain="true"
+            type="primary"
+            :class="activeClass == 3 ? 'active' : ''"
+            size="small"
+            @click="sortOrder(3)"
+          >按库存排序</el-button>
         </span>
       </div>
       <el-tabs v-model="activeName" @tab-click="handleClick">
@@ -22,7 +40,7 @@
       </el-tabs>
       <div class="filter-box">
         <el-form :inline="true" :model="filterForm" class="form-inline">
-          <el-form-item label="商品名称"><el-input size="small" v-model="filterForm.name" placeholder="商品名称"></el-input></el-form-item>
+          <el-form-item label="商品名称"><el-input v-model="filterForm.name" size="small" placeholder="商品名称"></el-input></el-form-item>
           <el-form-item>
             <el-button type="primary" size="small" @click="onSubmitFilter">查询</el-button>
             <el-button size="small" @click="clear">清空</el-button>
@@ -38,49 +56,55 @@
                 <el-table-column prop="id" label="id" width="60"></el-table-column>
                 <el-table-column prop="goods_sn" label="商品SKU" width="140">
                   <template slot-scope="scope">
-                    <el-input @blur="checkSkuOnly(scope.$index, scope.row)" size="mini" v-model="scope.row.goods_sn" placeholder="商品SKU"></el-input>
+                    <el-input v-model="scope.row.goods_sn" size="mini" placeholder="商品SKU" @blur="checkSkuOnly(scope.$index, scope.row)"></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column prop="goods_aka" label="快递单上的简称" width="160">
                   <template slot-scope="scope">
-                    <el-input size="mini" v-model="scope.row.goods_name" placeholder="简称"></el-input>
+                    <el-input v-model="scope.row.goods_name" size="mini" placeholder="简称"></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column prop="value" label="型号/规格" width="140">
                   <template slot-scope="scope">
-                    <el-input size="mini" v-model="scope.row.value" placeholder="如1斤/条"></el-input>
+                    <el-input v-model="scope.row.value" size="mini" placeholder="如1斤/条"></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column prop="cost" label="成本(元)" width="90">
                   <template slot-scope="scope">
-                    <el-input size="mini" v-model="scope.row.cost" placeholder="成本"></el-input>
+                    <el-input v-model="scope.row.cost" size="mini" placeholder="成本"></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column prop="retail_price" label="零售(元)" width="90">
                   <template slot-scope="scope">
-                    <el-input size="mini" v-model="scope.row.retail_price" placeholder="零售"></el-input>
+                    <el-input v-model="scope.row.retail_price" size="mini" placeholder="零售"></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column prop="goods_weight" label="重量(KG)" width="90">
                   <template slot-scope="scope">
-                    <el-input size="mini" v-model="scope.row.goods_weight" placeholder="重量"></el-input>
+                    <el-input v-model="scope.row.goods_weight" size="mini" placeholder="重量"></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column prop="goods_number" label="库存" width="90">
                   <template slot-scope="scope">
-                    <el-input size="mini" v-model="scope.row.goods_number" placeholder="库存"></el-input>
+                    <el-input v-model="scope.row.goods_number" size="mini" placeholder="库存"></el-input>
                   </template>
                 </el-table-column>
                 <el-table-column label="操作" width="140">
                   <template slot-scope="scope">
-                    <el-button size="mini" type="danger" icon="el-icon-check" circle @click="specSave(scope.$index, scope.row)"></el-button>
-                    <el-switch
+                    <el-button
                       size="mini"
+                      type="danger"
+                      icon="el-icon-check"
+                      circle
+                      @click="specSave(scope.$index, scope.row)"
+                    ></el-button>
+                    <el-switch
                       v-model="scope.row.is_on_sale"
-                      active-text=""
-                      inactive-text=""
-                      active-value="1"
-                      inactive-value="0"
+                      size="mini"
+                      activeText=""
+                      inactiveText=""
+                      activeValue="1"
+                      inactiveValue="0"
                       @change="changeProductStatus($event, scope.row.id)"
                     ></el-switch>
                   </template>
@@ -91,19 +115,19 @@
           <el-table-column prop="id" label="ID" width="120"></el-table-column>
           <el-table-column prop="list_pic_url" label="商品图片" width="80">
             <template slot-scope="scope">
-              <img :src="scope.row.list_pic_url" alt="" style="width: 40px;height: 40px" />
+              <img :src="scope.row.list_pic_url" alt="" style="width: 40px;height: 40px">
             </template>
           </el-table-column>
           <el-table-column prop="name" label="商品名称"></el-table-column>
           <el-table-column prop="sort_order" label="排序" width="140" sortable>
             <template slot-scope="scope">
               <el-input-number
+                v-model="scope.row.sort_order"
                 class="sort-width"
                 size="mini"
                 :min="1"
                 :max="100"
-                controls-position="right"
-                v-model="scope.row.sort_order"
+                controlsPosition="right"
                 placeholder="排序"
                 @blur="submitSort(scope.$index, scope.row)"
                 @change="submitSort(scope.$index, scope.row)"
@@ -114,12 +138,12 @@
           <el-table-column prop="goods_number" label="库存" width="80" sortable></el-table-column>
           <el-table-column label="首页显示" width="80">
             <template slot-scope="scope">
-              <el-switch v-model="scope.row.is_index" active-text="" inactive-text="" @change="changeShowStatus($event, scope.row.id)"></el-switch>
+              <el-switch v-model="scope.row.is_index" activeText="" inactiveText="" @change="changeShowStatus($event, scope.row.id)"></el-switch>
             </template>
           </el-table-column>
           <el-table-column label="上架" width="80">
             <template slot-scope="scope">
-              <el-switch v-model="scope.row.is_on_sale" active-text="" inactive-text="" @change="changeStatus($event, scope.row.id)"></el-switch>
+              <el-switch v-model="scope.row.is_on_sale" activeText="" inactiveText="" @change="changeStatus($event, scope.row.id)"></el-switch>
             </template>
           </el-table-column>
           <el-table-column label="操作">
@@ -131,7 +155,13 @@
         </el-table>
       </div>
       <div class="page-box">
-        <el-pagination @current-change="handlePageChange" :current-page="page" :page-size="size" layout="total, prev, pager, next, jumper" :total="total"></el-pagination>
+        <el-pagination
+          :currentPage="page"
+          :pageSize="size"
+          layout="total, prev, pager, next, jumper"
+          :total="total"
+          @current-change="handlePageChange"
+        ></el-pagination>
       </div>
     </div>
   </div>
@@ -139,7 +169,8 @@
 
 <script>
 export default {
-  data () {
+  components: {},
+  data() {
     return {
       page: 1,
       size: 10,
@@ -177,27 +208,28 @@ export default {
       ]
     }
   },
+  mounted() {
+    this.getOnSaleList()
+  },
   methods: {
-    stockSyc () {
+    stockSyc() {
       this.$confirm('确定要同步库存?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      })
-        .then(() => {
-          this.axios.post('crontab/updateStockByHand').then(response => {
-            if (response.data.errno === 0) {
-              this.$message({
-                type: 'success',
-                message: '同步成功'
-              })
-              this.getOnSaleList()
-            }
-          })
+      }).then(() => {
+        this.axios.post('crontab/updateStockByHand').then(response => {
+          if (response.data.errno === 0) {
+            this.$message({
+              type: 'success',
+              message: '同步成功'
+            })
+            this.getOnSaleList()
+          }
         })
-        .catch(() => {})
+      })
     },
-    updateGoodsNumber () {
+    updateGoodsNumber() {
       this.axios.post('goods/updateGoodsNumber').then(response => {
         if (response.data.errno === 0) {
           this.$message({
@@ -207,8 +239,8 @@ export default {
         }
       })
     },
-    specSave (index, row) {
-      if (row.goods_name == '' || row.value == '' || row.cost == '' || row.retail_price == '' || row.goods_weight == '') {
+    specSave(index, row) {
+      if (row.goods_name === '' || row.value === '' || row.cost === '' || row.retail_price === '' || row.goods_weight === '') {
         this.$message({
           type: 'error',
           message: '值不能为空!'
@@ -229,10 +261,10 @@ export default {
         }
       })
     },
-    checkSkuOnly (index, row) {
+    checkSkuOnly(index, row) {
       console.log(index)
       console.log(row)
-      if (row.goods_sn == '') {
+      if (!row.goods_sn) {
         this.$message({
           type: 'error',
           message: 'SKU不能为空'
@@ -253,13 +285,13 @@ export default {
         }
       })
     },
-    expandToggle () {
+    expandToggle() {
       this.expand = !this.expand
     },
-    test () {
+    test() {
       console.log(this.tableData)
     },
-    submitName (index, row) {
+    submitName(index, row) {
       this.axios.post('goods/updateShortName', { id: row.id, short_name: row.short_name }).then(response => {
         if (response.data.errno === 0) {
           this.$message({
@@ -269,46 +301,48 @@ export default {
         }
       })
     },
-    submitSort (index, row) {
-      this.axios.post('goods/updateSort', { id: row.id, sort: row.sort_order }).then(response => {})
+    submitSort(index, row) {
+      this.axios.post('goods/updateSort', { id: row.id, sort: row.sort_order }).then(response => {
+        console.log(response)
+      })
     },
-    handleClick (tab, event) {
+    handleClick(tab) {
       const pindex = tab._data.index
       this.page = 1
       this.activeClass = 0
-      if (pindex == 0) {
+      if (+pindex === 0) {
         this.getList()
         this.pIndex = 0
-      } else if (pindex == 1) {
+      } else if (+pindex === 1) {
         this.getOnSaleList()
         this.pIndex = 1
-      } else if (pindex == 2) {
+      } else if (+pindex === 2) {
         this.getOutList()
         this.pIndex = 2
-      } else if (pindex == 3) {
+      } else if (+pindex === 3) {
         this.getDropList()
         this.pIndex = 3
       }
     },
-    handlePageChange (val) {
+    handlePageChange(val) {
       this.page = val
       const nIndex = this.pIndex
-      if (nIndex == 0) {
+      if (+nIndex === 0) {
         this.getList()
-      } else if (nIndex == 1) {
+      } else if (+nIndex === 1) {
         this.getOnSaleList()
-      } else if (nIndex == 2) {
+      } else if (+nIndex === 2) {
         this.getOutList()
-      } else if (nIndex == 3) {
+      } else if (+nIndex === 3) {
         this.getDropList()
-      } else if (nIndex == 4) {
+      } else if (+nIndex === 4) {
         this.sortOrder(this.num)
       }
     },
-    handleRowEdit (index, row) {
+    handleRowEdit(index, row) {
       this.$router.push({ name: 'goods_add', query: { id: row.id } })
     },
-    handleRowDelete (index, row) {
+    handleRowDelete(index, row) {
       this.$confirm('确定要删除?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -324,13 +358,13 @@ export default {
               })
               const pIndex = localStorage.getItem('pIndex')
               console.log(pIndex)
-              if (pIndex == 0) {
+              if (+pIndex === 0) {
                 that.getList()
-              } else if (pIndex == 1) {
+              } else if (+pIndex === 1) {
                 that.getOnSaleList()
-              } else if (pIndex == 2) {
+              } else if (+pIndex === 2) {
                 that.getOutList()
-              } else if (pIndex == 3) {
+              } else if (+pIndex === 3) {
                 that.getDropList()
               }
             }
@@ -343,11 +377,11 @@ export default {
           //                    });
         })
     },
-    onSubmitFilter () {
+    onSubmitFilter() {
       this.page = 1
       this.getList()
     },
-    clear () {
+    clear() {
       this.axios
         .get('goods', {
           params: {
@@ -361,7 +395,7 @@ export default {
           this.total = response.data.data.count
         })
     },
-    getList () {
+    getList() {
       this.axios
         .get('goods', {
           params: {
@@ -376,7 +410,7 @@ export default {
           this.total = response.data.data.count
         })
     },
-    getOnSaleList () {
+    getOnSaleList() {
       this.axios
         .get('goods/onsale', {
           params: {
@@ -390,7 +424,7 @@ export default {
           this.total = response.data.data.count
         })
     },
-    getOutList () {
+    getOutList() {
       this.axios
         .get('goods/out', {
           params: {
@@ -404,7 +438,7 @@ export default {
           this.total = response.data.data.count
         })
     },
-    getDropList () {
+    getDropList() {
       this.axios
         .get('goods/drop', {
           params: {
@@ -418,7 +452,7 @@ export default {
           this.total = response.data.data.count
         })
     },
-    sortOrder (num) {
+    sortOrder(num) {
       this.num = num
       this.pIndex = 4
       this.activeClass = num
@@ -436,7 +470,7 @@ export default {
           this.total = response.data.data.count
         })
     },
-    changeStatus ($event, para) {
+    changeStatus($event, para) {
       this.axios
         .get('goods/saleStatus', {
           params: {
@@ -444,9 +478,11 @@ export default {
             id: para
           }
         })
-        .then(response => {})
+        .then(response => {
+          console.log(response)
+        })
     },
-    changeProductStatus ($event, para) {
+    changeProductStatus($event, para) {
       this.axios
         .get('goods/productStatus', {
           params: {
@@ -454,9 +490,11 @@ export default {
             id: para
           }
         })
-        .then(response => {})
+        .then(response => {
+          console.log(response)
+        })
     },
-    changeShowStatus ($event, para) {
+    changeShowStatus($event, para) {
       this.axios
         .get('goods/indexShowStatus', {
           params: {
@@ -464,12 +502,10 @@ export default {
             id: para
           }
         })
-        .then(response => {})
+        .then(response => {
+          console.log(response)
+        })
     }
-  },
-  components: {},
-  mounted () {
-    this.getOnSaleList()
   }
 }
 </script>

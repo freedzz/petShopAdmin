@@ -18,7 +18,7 @@
           <el-table-column prop="goods_id" label="商品ID" width="100px"></el-table-column>
           <el-table-column prop="list_pic_url" label="图片" width="70px">
             <template slot-scope="scope">
-              <img :src="scope.row.list_pic_url" alt="" style="width: 50px;height: 50px" />
+              <img :src="scope.row.list_pic_url" alt="" style="width: 50px;height: 50px">
             </template>
           </el-table-column>
           <el-table-column prop="goods_name" label="商品名称"></el-table-column>
@@ -34,7 +34,13 @@
         </el-table>
       </div>
       <div class="page-box">
-        <el-pagination @current-change="handlePageChange" :current-page="page" :page-size="10" layout="total, prev, pager, next, jumper" :total="total"></el-pagination>
+        <el-pagination
+          :currentPage="page"
+          :pageSize="10"
+          layout="total, prev, pager, next, jumper"
+          :total="total"
+          @current-change="handlePageChange"
+        ></el-pagination>
       </div>
     </div>
   </div>
@@ -42,7 +48,8 @@
 
 <script>
 export default {
-  data () {
+  components: {},
+  data() {
     return {
       page: 1,
       total: 0,
@@ -52,8 +59,11 @@ export default {
       tableData: []
     }
   },
+  mounted() {
+    this.getList()
+  },
   methods: {
-    handlePageChange (val) {
+    handlePageChange(val) {
       this.page = val
       // 保存到localStorage
       localStorage.setItem('shopCartPage', this.page)
@@ -61,11 +71,11 @@ export default {
       this.getList()
     },
 
-    onSubmitFilter () {
+    onSubmitFilter() {
       this.page = 1
       this.getList()
     },
-    getList () {
+    getList() {
       this.axios
         .get('shopcart', {
           params: {
@@ -79,10 +89,6 @@ export default {
           this.total = response.data.data.count
         })
     }
-  },
-  components: {},
-  mounted () {
-    this.getList()
   }
 }
 </script>

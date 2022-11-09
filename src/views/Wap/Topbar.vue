@@ -1,31 +1,31 @@
 <template>
-    <div class="top-box">
-        <div class="top-wrap">汇鲜</div>
-    </div>
+  <div class="top-box">
+    <div class="top-wrap">汇鲜</div>
+  </div>
 
 </template>
 
 <script>
 
-    export default {
-        data() {
-            return {
-                currentPagePath: '/wap',
-                loginInfo:null,
-                username:''
-            }
-        },
-        methods: {
-
-        },
-        mounted() {
-            console.log(this.$route.path);
-            if(!this.loginInfo){
-                this.loginInfo = JSON.parse(window.localStorage.getItem('userInfo') || null);
-                this.username = this.loginInfo.username;
-            }
-        }
+export default {
+  data() {
+    return {
+      currentPagePath: '/wap',
+      loginInfo:null,
+      username:''
     }
+  },
+  mounted() {
+    console.log(this.$route.path)
+    if(!this.loginInfo) {
+      this.loginInfo = JSON.parse(window.localStorage.getItem('userInfo') || null)
+      this.username = this.loginInfo.username
+    }
+  },
+  methods: {
+
+  }
+}
 
 </script>
 <style scoped>

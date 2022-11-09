@@ -4,40 +4,35 @@
       <el-tab-pane label="自定义图标" name="1">
         <div class="custom-svg flex flex-wrap">
           <el-card
+            v-for="(svg, index) in svgList"
+            :key="index"
             class="svg-item margin-lr-sm"
             shadow="hover"
             style="cursor: pointer"
-            v-for="(svg, index) in svgList"
-            :key="index"
             @click.native="handleCopyIcon(svg, true, $event)"
           >
-            <svg-icon :icon-class="svg" class-name="icon"></svg-icon>
-            <div class="icon-name">{{svg}}</div>
+            <svg-icon :iconClass="svg" className="icon"></svg-icon>
+            <div class="icon-name">{{ svg }}</div>
           </el-card>
         </div>
       </el-tab-pane>
       <el-tab-pane label="element-ui图标" name="2">
         <div class="element-ui-icon flex flex-wrap">
           <el-card
+            v-for="(svg, index) in elementIcons"
+            :key="index"
             class="svg-item margin-lr-sm"
             shadow="hover"
             style="cursor: pointer"
-            v-for="(svg, index) in elementIcons"
-            :key="index"
             @click.native="handleCopyIcon(svg, false, $event)"
           >
             <i :class="svg" class="icon"></i>
-            <div class="icon-name">{{svg}}</div>
+            <div class="icon-name">{{ svg }}</div>
           </el-card>
         </div>
       </el-tab-pane>
     </el-tabs>
-    <div class="search-bar">
-      <el-input
-        v-model="searchKey"
-        placeholder="请输入搜索条件..."
-      />
-    </div>
+    <div class="search-bar"><el-input v-model="searchKey" placeholder="请输入搜索条件..." /></div>
   </div>
 </template>
 
@@ -49,14 +44,14 @@ import { elementIcons } from './constant.js'
 const requireSvg = require.context('@/assets/icons/svg', true, /\.svg/)
 const svgList = []
 // 编辑文件获取每个组件的名字和config
-requireSvg.keys().forEach((svg) => {
+requireSvg.keys().forEach(svg => {
   const svgIcon = svg.split('.')[1]
   svgList.push(svgIcon.split('/')[1])
 })
 
 export default {
   name: 'Icons',
-  data () {
+  data() {
     return {
       activeName: '1',
       svgList: svgList,
@@ -65,9 +60,10 @@ export default {
       searchKey: ''
     }
   },
+  computed: {},
   watch: {
     searchKey: {
-      handler (value) {
+      handler(value) {
         console.log(value)
         if (this.activeName === '1') {
           this.svgList = value ? this.svgList.filter(icon => icon.indexOf(value) > -1) : svgList
@@ -77,9 +73,8 @@ export default {
       }
     }
   },
-  computed: {},
   methods: {
-    tabClick (tab) {
+    tabClick(tab) {
       if (tab.name === '1') {
         this.svgList = svgList
       } else {
@@ -87,64 +82,62 @@ export default {
       }
       this.searchKey = ''
     },
-    filterIcon () {
+    filterIcon() {
       this.elementIcons = this.elementIcons.filter(icon => icon.indexOf(this.searchKey) > -1)
     },
-    handleCopyIcon (svg, isCostom, event) {
+    handleCopyIcon(svg, isCostom, event) {
       const copyText = isCostom ? `<svg-icon icon-class='${svg}' class-name='icon'></svg-icon>` : `<i class="${svg}" class="icon"></i>`
       clip(copyText, event)
     }
-  },
-  created () {}
+  }
 }
 </script>
 
 <style lang="scss" scoped>
-.icons{
+.icons {
   position: relative;
-  .el-tabs{
-    .el-tab-pane{
+  .el-tabs {
+    .el-tab-pane {
       display: flex;
-      .svg-item{
-         margin-top: 10px;
-         width: 150px;
-         &:hover{
-           .icon,.icon-name{
-             color: #409EFF;
-           }
-         }
-         /deep/ .el-card__body{
-           display: flex;
-           flex-direction: column;
-           justify-content: center;
-           align-items: center;
-           padding: 10px;
-           .icon{
-             font-size: 18px;
-             margin-bottom: 10px;
-           }
-         }
-         .icon-name{
-           font-size: 8px;
-           line-height: 12px;
-           text-align: center;
-         }
+      .svg-item {
+        margin-top: 10px;
+        width: 150px;
+        &:hover {
+          .icon,
+          .icon-name {
+            color: #409eff;
+          }
+        }
+        /deep/ .el-card__body {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          padding: 10px;
+          .icon {
+            font-size: 18px;
+            margin-bottom: 10px;
+          }
+        }
+        .icon-name {
+          font-size: 8px;
+          line-height: 12px;
+          text-align: center;
+        }
       }
     }
   }
-  .search-bar{
+  .search-bar {
     position: absolute;
     top: 6px;
     left: 250px;
-    .el-input{
-      /deep/ .el-input__inner{
+    .el-input {
+      /deep/ .el-input__inner {
         height: 20px;
         line-height: 20px;
         font-size: 12px;
       }
-
     }
   }
-
 }
 </style>
