@@ -25,7 +25,7 @@
 </template>
 
 <script>
-// import api from '@/config/api'
+import { getDetail, specificationDelete, specificationUpdate, specificationAdd } from '@/api/specification/specification'
 export default {
   components: {},
   data() {
@@ -42,7 +42,6 @@ export default {
   },
   mounted() {
     this.infoForm.id = this.$route.query.id || 0
-
     this.getInfo()
   },
   methods: {
@@ -51,22 +50,21 @@ export default {
         name: this.infoForm.name,
         sort_order: this.infoForm.sort_order
       }
-      this.$refs['infoForm'].validate(valid => {
+      this.$refs['infoForm'].validate(async (valid) => {
         if (valid) {
-          this.axios.post('specification/add', info).then(response => {
-            if (response.data.errno === 0) {
-              this.$message({
-                type: 'success',
-                message: '添加成功!'
-              })
-              this.$router.go(-1)
-            } else {
-              this.$message({
-                type: 'error',
-                message: '添加失败'
-              })
-            }
-          })
+          let res = await specificationAdd(info)
+          if(!res.errno) {
+            this.$message({
+              type: 'success',
+              message: '添加成功!'
+            })
+            this.$router.go(-1)
+          } else {
+            this.$message({
+              type: 'error',
+              message: '添加失败'
+            })
+          }
         } else {
           return false
         }
@@ -78,22 +76,21 @@ export default {
         name: this.infoForm.name,
         sort_order: this.infoForm.sort_order
       }
-      this.$refs['infoForm'].validate(valid => {
+      this.$refs['infoForm'].validate(async (valid) => {
         if (valid) {
-          this.axios.post('specification/update', info).then(response => {
-            if (response.data.errno === 0) {
-              this.$message({
-                type: 'success',
-                message: '保存成功!'
-              })
-              this.$router.go(-1)
-            } else {
-              this.$message({
-                type: 'error',
-                message: '保存失败'
-              })
-            }
-          })
+          let res = await specificationUpdate(info)
+          if(!res.errno) {
+            this.$message({
+              type: 'success',
+              message: '保存成功!'
+            })
+            this.$router.go(-1)
+          } else {
+            this.$message({
+              type: 'error',
+              message: '保存失败'
+            })
+          }
         } else {
           return false
         }
@@ -104,44 +101,37 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.axios.post('specification/delete', { id: row.id }).then(response => {
-          console.log(response.data)
-          if (response.data.errno === 0) {
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
-            this.$router.go(-1)
-          } else {
-            this.$message({
-              type: 'error',
-              message: '删除失败，该型号下有商品!'
-            })
-          }
+      }).then(async () => {
+        let res = await specificationDelete({
+          id: row.id
         })
+        if(!res.errno) {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          this.$router.go(-1)
+        } else {
+          this.$message({
+            type: 'error',
+            message: '删除失败，该型号下有商品!'
+          })
+        }
       })
     },
     goBackPage() {
       this.$router.go(-1)
     },
-    getInfo() {
-      console.log(this.infoForm.id)
-      console.log(this.infoForm.id)
-      console.log(this.infoForm.id)
+    async getInfo() {
       if (this.infoForm.id <= 0) {
         return false
       }
-      let that = this
-      this.axios
-        .post('specification/detail', {
-          id: that.infoForm.id
-        })
-        .then(response => {
-          let resInfo = response.data.data
-          console.log(resInfo)
-          that.infoForm = resInfo
-        })
+      let res = await getDetail({
+        id: this.infoForm.id
+      })
+      if(!res.errno) {
+        this.infoForm = res.data
+      }
     }
   }
 }

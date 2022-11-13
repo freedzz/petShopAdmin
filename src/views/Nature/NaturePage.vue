@@ -78,6 +78,17 @@
   </div>
 </template>
 <script>
+import {
+  getSpecification,
+  getCategory,
+  categoryDestory,
+  specificationDelete,
+  updateSort,
+  getCategoryStatus,
+  getChannelStatus,
+  getShowStatus
+} from '@/api/nature/nature'
+
 export default {
   components: {},
   data() {
@@ -107,41 +118,46 @@ export default {
         this.pIndex = 1
       }
     },
-    changeShowStatus($event, para) {
-      this.axios
-        .get('category/showStatus', {
-          params: {
-            status: $event,
-            id: para
-          }
-        })
+    async changeShowStatus($event, para) {
+      let res = await getShowStatus({
+        status: $event,
+        id: para
+      })
+      if(!res.errno) {
+        console.log(res)
+      }
     },
-    changeChannelStatus($event, para) {
-      this.axios
-        .get('category/channelStatus', {
-          params: {
-            status: $event,
-            id: para
-          }
-        })
+    async changeChannelStatus($event, para) {
+      let res = await getChannelStatus({
+        status: $event,
+        id: para
+      })
+      if(!res.errno) {
+        console.log(res)
+      }
     },
-    changeCategoryStatus($event, para) {
-      this.axios
-        .get('category/categoryStatus', {
-          params: {
-            status: $event,
-            id: para
-          }
-        })
+    async changeCategoryStatus($event, para) {
+      let res = await getCategoryStatus({
+        status: $event,
+        id: para
+      })
+      if(!res.errno) {
+        console.log(res)
+      }
     },
-    submitSort(index, row) {
-      this.axios.post('category/updateSort', { id: row.id, sort: row.sort_order })
+    async submitSort(index, row) {
+      let res = await updateSort({
+        id: row.id,
+        sort: row.sort_order
+      })
+      if(!res.errno) {
+        console.log(res)
+      }
     },
     handleRowEdit(index, row) {
       this.$router.push({ name: 'category_add', query: { id: row.id } })
     },
     specEdit(index, row) {
-      console.log(row.id)
       this.$router.push({ name: 'specification_detail', query: { id: row.id } })
     },
     specDelete(index, row) {
@@ -149,22 +165,22 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.axios.post('specification/delete', { id: row.id }).then(response => {
-          console.log(response.data)
-          if (response.data.errno === 0) {
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
-            this.getSpecList()
-          } else {
-            this.$message({
-              type: 'error',
-              message: '删除失败，该型号下有商品!'
-            })
-          }
+      }).then(async () => {
+        let res = await specificationDelete({
+          id: row.id
         })
+        if(!res.errno) {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          this.getSpecList()
+        } else {
+          this.$message({
+            type: 'error',
+            message: '删除失败，该型号下有商品!'
+          })
+        }
       })
     },
     handleRowDelete(index, row) {
@@ -172,40 +188,37 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.axios.post('category/destory', { id: row.id }).then(response => {
-          console.log(response.data)
-          if (response.data.errno === 0) {
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
-
-            this.getList()
-          } else {
-            this.$message({
-              type: 'error',
-              message: '删除失败，该分类有子分类!'
-            })
-          }
+      }).then(async () => {
+        let res = await categoryDestory({
+          id: row.id
         })
+        if(!res.errno) {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          this.getList()
+        } else {
+          this.$message({
+            type: 'error',
+            message: '删除失败，该分类有子分类!'
+          })
+        }
       })
     },
-    getList() {
-      this.axios
-        .get('category', {
-          params: {
-            page: this.page
-          }
-        })
-        .then(response => {
-          this.categoryData = response.data.data
-        })
-    },
-    getSpecList() {
-      this.axios.get('specification').then(response => {
-        this.specData = response.data.data
+    async getList() {
+      let res = await getCategory({
+        page: this.page
       })
+      if(!res.errno) {
+        this.categoryData = res.data
+      }
+    },
+    async getSpecList() {
+      let res = await getSpecification()
+      if(!res.errno) {
+        this.specData = res.data
+      }
     }
   }
 }

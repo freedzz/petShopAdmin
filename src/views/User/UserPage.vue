@@ -56,6 +56,7 @@
 </template>
 
 <script>
+import { userUpdateInfo, userDestory, getUser } from '@/api/user/user'
 export default {
   components: {},
   data() {
@@ -80,10 +81,14 @@ export default {
     this.getList()
   },
   methods: {
-    submitNick(index, row) {
-      this.axios.post('user/updateInfo', { id: row.id, nickname: row.nickname }).then(response => {
-        console.log(response)
+    async submitNick(index, row) {
+      let res = await userUpdateInfo({
+        id: row.id,
+        nickname: row.nickname
       })
+      if(!res.errno) {
+        console.log(res)
+      }
     },
     handlePageChange(val) {
       this.page = val
@@ -99,39 +104,33 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.axios.post('user/destory', { id: row.id }).then(response => {
-          console.log(response.data)
-          if (response.data.errno === 0) {
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
-
-            this.getList()
-          }
+      }).then(async () => {
+        let res = await userDestory({
+          id: row.id
         })
+        if(!res.errno) {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          this.getList()
+        }
       })
     },
     onSubmitFilter() {
       this.page = 1
       this.getList()
     },
-    getList() {
-      this.axios
-        .get('user', {
-          params: {
-            page: this.page,
-            nickname: this.filterForm.nickname
-          }
-        })
-        .then(response => {
-          console.log(response.data)
-          console.log(response)
-          this.tableData = response.data.data.userData.data
-          this.page = response.data.data.userData.currentPage
-          this.total = response.data.data.userData.count
-        })
+    async getList() {
+      let res = await getUser({
+        page: this.page,
+        nickname: this.filterForm.nickname
+      })
+      if(!res.errno) {
+        this.tableData = res.data.userData.data
+        this.page = res.data.userData.currentPage
+        this.total = res.data.userData.count
+      }
       if (!this.loginInfo) {
         this.loginInfo = JSON.parse(window.localStorage.getItem('userInfo') || null)
         this.username = this.loginInfo.username

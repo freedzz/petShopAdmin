@@ -70,7 +70,14 @@
 
 <script>
 import api from '@/config/api'
-// import ElFormItem from "../../../../node_modules/element-ui/packages/form/src/form-item.vue";
+import {
+  categoryInfo,
+  getTopCategory,
+  saveStore,
+  deleteIconImage,
+  deleteBannerImage,
+  getQiniuToken
+} from '@/api/category/category'
 
 export default {
   components: {
@@ -78,7 +85,6 @@ export default {
   },
   data() {
     return {
-      root: '',
       qiniuZone: '',
       fileList: [],
       fileList2: [],
@@ -114,19 +120,17 @@ export default {
     this.getTopCategory()
     this.infoForm.id = this.$route.query.id || 0
     this.getInfo()
-    this.root = api.rootUrl
     this.qiniuZone = api.qiniu
     this.getQiniuToken()
   },
   methods: {
-    getQiniuToken() {
-      const that = this
-      this.axios.post('index/getQiniuToken').then(response => {
-        const resInfo = response.data.data
-        console.log(resInfo)
-        that.picData.token = resInfo.token
-        that.url = resInfo.url
-      })
+    async getQiniuToken() {
+      let res = await getQiniuToken()
+      if(!res.errno) {
+        const resInfo = res.data
+        this.picData.token = resInfo.token
+        this.url = resInfo.url
+      }
     },
     beforeBannerRemove() {
       return this.$confirm('确定移除该图？删除后将无法找回')
@@ -134,25 +138,29 @@ export default {
     beforeIconRemove() {
       return this.$confirm('确定移除图标？删除后将无法找回')
     },
-    bannerRemove() {
+    async bannerRemove() {
       this.infoForm.img_url = ''
-      const id = this.infoForm.id
-      this.axios.post('category/deleteBannerImage', { id: id }).then(() => {
+      let res = await deleteBannerImage({
+        id: this.infoForm.id
+      })
+      if(!res.errno) {
         this.$message({
           type: 'success',
           message: '删除成功'
         })
-      })
+      }
     },
-    iconRemove() {
+    async iconRemove() {
       this.infoForm.icon_url = ''
-      const id = this.infoForm.id
-      this.axios.post('category/deleteIconImage', { id: id }).then(() => {
+      let res = await deleteIconImage({
+        id: this.infoForm.id
+      })
+      if(!res.errno) {
         this.$message({
           type: 'success',
           message: '删除成功'
         })
-      })
+      }
     },
     goBackPage() {
       this.$router.go(-1)
@@ -160,22 +168,21 @@ export default {
     onSubmitInfo() {
       this.infoForm.level = +this.infoForm.parent_id === 0 ? 'L1' : 'L2'
       console.log(this.infoForm.level)
-      this.$refs.infoForm.validate(valid => {
+      this.$refs.infoForm.validate(async (valid) => {
         if (valid) {
-          this.axios.post('category/store', this.infoForm).then(response => {
-            if (response.data.errno === 0) {
-              this.$message({
-                type: 'success',
-                message: '保存成功'
-              })
-              this.$router.go(-1)
-            } else {
-              this.$message({
-                type: 'error',
-                message: '保存失败'
-              })
-            }
-          })
+          let res = await saveStore(this.infoForm)
+          if(!res.errno) {
+            this.$message({
+              type: 'success',
+              message: '保存成功'
+            })
+            this.$router.go(-1)
+          } else {
+            this.$message({
+              type: 'error',
+              message: '保存失败'
+            })
+          }
         } else {
           return false
         }
@@ -189,38 +196,34 @@ export default {
       const url = this.url
       this.infoForm.icon_url = url + res.key
     },
-    getTopCategory() {
-      this.axios.get('category/topCategory').then(response => {
-        this.parentCategory = this.parentCategory.concat(response.data.data)
-      })
+    async getTopCategory() {
+      let res = await getTopCategory()
+      if(!res.errno) {
+        this.parentCategory = this.parentCategory.concat(res.data)
+      }
     },
-    getInfo() {
+    async getInfo() {
       if (this.infoForm.id <= 0) {
         return false
       }
       // 加载分类详情
-      const that = this
-      this.axios
-        .get('category/info', {
-          params: {
-            id: that.infoForm.id
-          }
-        })
-        .then(response => {
-          const resInfo = response.data.data
-          console.log(resInfo)
-          const data = {
-            name: '分类图',
-            url: resInfo.img_url
-          }
-          this.fileList.push(data)
-          const iconData = {
-            name: '图标',
-            url: resInfo.icon_url
-          }
-          this.fileList2.push(iconData)
-          that.infoForm = resInfo
-        })
+      let res = await categoryInfo({
+        id: this.infoForm.id
+      })
+      if(!res.errno) {
+        const resInfo = res.data
+        const data = {
+          name: '分类图',
+          url: resInfo.img_url
+        }
+        this.fileList.push(data)
+        const iconData = {
+          name: '图标',
+          url: resInfo.icon_url
+        }
+        this.fileList2.push(iconData)
+        this.infoForm = resInfo
+      }
     }
   }
 }

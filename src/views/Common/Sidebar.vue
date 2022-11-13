@@ -80,6 +80,7 @@
 </template>
 
 <script>
+import { checkLogin } from '@/api/sidebar/sidebar'
 export default {
   data() {
     return {
@@ -111,14 +112,12 @@ export default {
         this.$router.replace({ name: 'login' })
       })
     },
-    checkLogin() {
-      this.axios.get('index/checkLogin').then(response => {
-        console.log(response.data)
-        if (response.data.errno === 401) {
-          localStorage.clear()
-          this.$router.replace({ name: 'login' })
-        }
-      })
+    async checkLogin() {
+      let res = await checkLogin()
+      if(res.errno === 401) {
+        localStorage.clear()
+        this.$router.replace({ name: 'login' })
+      }
     }
   }
 }

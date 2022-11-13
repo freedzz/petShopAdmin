@@ -2,11 +2,6 @@
   <div class="content-page">
     <div class="content-nav">
       <el-breadcrumb class="breadcrumb" separator="/"><el-breadcrumb-item>管理员</el-breadcrumb-item></el-breadcrumb>
-      <!-- <div class="operation-nav">
-				<router-link to="/dashboard/user">
-					<el-button type="primary" icon="plus">添加管理员</el-button>
-				</router-link>
-			</div> -->
     </div>
     <div class="content-main">
       <div class="form-table-box">
@@ -36,8 +31,8 @@
 </template>
 
 <script>
+import { deleAdmin, getAdmin } from '@/api/admin/admin'
 export default {
-  components: {},
   data() {
     return {
       page: 1,
@@ -65,28 +60,28 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.axios.post('admin/deleAdmin', { id: row.id }).then(response => {
-          console.log(response.data)
-          if (response.data.errno === 0) {
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
-            this.getList()
-          }
+      }).then(async () => {
+        let res = await deleAdmin({
+          id: row.id
         })
+        if (res.errno === 0) {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          this.getList()
+        }
       })
     },
     onSubmitFilter() {
       this.page = 1
       this.getList()
     },
-    getList() {
-      this.axios.get('admin').then(response => {
-        this.tableData = response.data.data
-        console.log(this.tableData)
-      })
+    async getList() {
+      let res = await getAdmin()
+      if(!res.errno) {
+        this.tableData = res.data
+      }
     }
   }
 }

@@ -43,7 +43,7 @@
 </template>
 
 <script>
-// import api from '@/config/api'
+import { showsetStore, getShowset } from '@/api/showset/showset'
 
 export default {
   components: {},
@@ -64,37 +64,34 @@ export default {
       this.$router.go(-1)
     },
     onSubmitInfo() {
-      this.$refs['infoForm'].validate(valid => {
+      this.$refs['infoForm'].validate(async (valid) => {
         if (valid) {
-          this.axios.post('admin/showsetStore', this.infoForm).then(response => {
-            if (response.data.errno === 0) {
-              this.$message({
-                type: 'success',
-                message: '保存成功'
-              })
-              //                                this.$router.go(-1)
-            } else {
-              this.$message({
-                type: 'error',
-                message: '保存失败'
-              })
-            }
-          })
+          let res = await showsetStore(this.infoForm)
+          if(!res.errno) {
+            this.$message({
+              type: 'success',
+              message: '保存成功'
+            })
+          } else {
+            this.$message({
+              type: 'error',
+              message: '保存失败'
+            })
+          }
         } else {
           return false
         }
       })
     },
-    getInfo() {
+    async getInfo() {
       if (this.infoForm.id <= 0) {
         return false
       }
       //加载优惠券详情
-      let that = this
-      this.axios.get('admin/showset').then(response => {
-        let resInfo = response.data.data
-        that.infoForm = resInfo
-      })
+      let res = await getShowset()
+      if(!res.errno) {
+        this.infoForm = res.data
+      }
     }
   }
 }

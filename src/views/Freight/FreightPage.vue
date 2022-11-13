@@ -36,7 +36,7 @@
 </template>
 
 <script>
-
+import { shipperDestory, shipperFreight } from '@/api/freight/freight'
 export default {
   components: {},
   data () {
@@ -65,24 +65,24 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.axios.post('shipper/destory', { id: row.id }).then((response) => {
-          console.log(response.data)
-          if (response.data.errno === 0) {
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
-            this.getList()
-          }
+      }).then(async () => {
+        let res = await shipperDestory({
+          id: row.id
         })
+        if(!res.errno) {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          this.getList()
+        }
       })
     },
-    getList () {
-      this.axios.get('shipper/freight').then((response) => {
-        console.log(response)
-        this.tableData = response.data.data
-      })
+    async getList () {
+      let res = await shipperFreight()
+      if(!res.errno) {
+        this.tableData = res.data
+      }
     }
   }
 }

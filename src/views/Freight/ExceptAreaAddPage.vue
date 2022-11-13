@@ -51,8 +51,7 @@
 </template>
 
 <script>
-// import api from '@/config/api'
-
+import { exceptAreaDetail, addExceptArea, saveExceptArea, getareadata } from '@/api/freight/freight'
 export default {
   components: {},
   data() {
@@ -110,7 +109,7 @@ export default {
       that.specEditVisible = false
     },
     onSaveTemplate() {
-      this.$refs.infoForm.validate(valid => {
+      this.$refs.infoForm.validate(async valid => {
         if (valid) {
           const data = this.tableData[0]
           if (!data.area) {
@@ -120,34 +119,29 @@ export default {
             })
             return false
           }
-          const that = this
-          this.axios
-            .post('shipper/saveExceptArea', {
-              table: that.tableData,
-              info: that.infoForm
+          let res = await saveExceptArea({
+            table: this.tableData,
+            info: this.infoForm
+          })
+          if (res.errno === 0) {
+            this.$message({
+              type: 'success',
+              message: '保存成功'
             })
-            .then(response => {
-              if (response.data.errno === 0) {
-                this.$message({
-                  type: 'success',
-                  message: '保存成功'
-                })
-                that.getInfo()
-              } else {
-                this.$message({
-                  type: 'error',
-                  message: '保存失败'
-                })
-              }
+            this.getInfo()
+          } else {
+            this.$message({
+              type: 'error',
+              message: '保存失败'
             })
+          }
         } else {
           return false
         }
       })
     },
     onAddTemplate() {
-      console.log('哈哈哈')
-      this.$refs.infoForm.validate(valid => {
+      this.$refs.infoForm.validate(async valid => {
         if (valid) {
           const data = this.tableData[0]
           if (!data.area) {
@@ -157,26 +151,22 @@ export default {
             })
             return false
           }
-          const that = this
-          this.axios
-            .post('shipper/addExceptArea', {
-              table: that.tableData,
-              info: that.infoForm
+          let res = await addExceptArea({
+            table: this.tableData,
+            info: this.infoForm
+          })
+          if (res.errno === 0) {
+            this.$message({
+              type: 'success',
+              message: '添加成功'
             })
-            .then(response => {
-              if (response.data.errno === 0) {
-                this.$message({
-                  type: 'success',
-                  message: '添加成功'
-                })
-                this.$router.go(-1)
-              } else {
-                this.$message({
-                  type: 'error',
-                  message: '添加失败'
-                })
-              }
+            this.$router.go(-1)
+          } else {
+            this.$message({
+              type: 'error',
+              message: '添加失败'
             })
+          }
         } else {
           return false
         }
@@ -188,43 +178,35 @@ export default {
     goBackPage() {
       this.$router.go(-1)
     },
-    getAllAreaData() {
-      const that = this
-      this.axios.post('shipper/getareadata').then(response => {
-        if (response.data.errno === 0) {
-          that.areaData = response.data.data
-        }
-      })
+    async getAllAreaData() {
+      let res = await getareadata()
+      if (!res.errno) {
+        this.areaData = res.data
+      }
     },
     handleRowEdit() {
       const nowArea = this.tableData[0].area
       this.selectedArea = nowArea.split(',').map(Number)
       this.specEditVisible = true
     },
-
-    getInfo() {
+    async getInfo() {
       if (this.infoForm.id <= 0) {
         return false
       }
       // 加载快递公司详情
-      const that = this
-      this.axios
-        .post('shipper/exceptAreaDetail', {
-          id: that.infoForm.id
-        })
-        .then(response => {
-          // console.log(response.data.data);
-          const info = response.data.data
-          that.infoForm = info
-          that.tableData = [
-            {
-              area: info.area,
-              areaName: info.areaName
-
-            }
-          ]
-          // that.tableData = response.data.data.data;
-        })
+      let res = await exceptAreaDetail({
+        id: this.infoForm.id
+      })
+      if (!res.errno) {
+        const info = res.data
+        this.infoForm = info
+        this.tableData = [
+          {
+            area: info.area,
+            areaName: info.areaName
+          }
+        ]
+      }
     }
   }
 }

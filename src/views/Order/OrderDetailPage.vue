@@ -227,12 +227,19 @@
 </template>
 
 <script>
-// import ElButton from '../../../../node_modules/element-ui/packages/button/src/button.vue'
+import {
+  orderChangeStatus,
+  getOrderExpress,
+  goodsListDelete,
+  saveGoodsList,
+  saveAddress,
+  orderpack,
+  saveAdminMemo,
+  getAllRegion,
+  getOrderDetail,
+} from '@/api/order/order'
 
 export default {
-  components: {
-    // ElButton
-  },
   data() {
     return {
       statusList: [
@@ -269,9 +276,6 @@ export default {
         order_sn: 0
       },
       infoRules: {
-        //                    goods_sn: [
-        //                        {required: true, message: '请输入商品编号', trigger: 'blur'},
-        //                    ],
         user_id: [{ required: true, message: '请输入名称', trigger: 'blur' }],
         order_sn: [{ required: true, message: '请输入简介', trigger: 'blur' }],
         order_status: [{ required: true, message: '请选择商品图片', trigger: 'blur' }]
@@ -287,7 +291,6 @@ export default {
     }
   },
   mounted() {
-    //            console.log(this.$route.query);
     this.infoForm.id = this.$route.query.id || 0
     this.getInfo()
     this.getAllRegion()
@@ -296,39 +299,42 @@ export default {
     changeStatus() {
       this.statusVisible = true
     },
-    statusConfirm() {
-      this.axios.post('order/changeStatus', { status: this.statusValue, orderSn: this.infoForm.order_sn }).then(() => {
-        //                    console.log(response.data);
+    async tatusConfirm() {
+      let res = await orderChangeStatus({
+        status: this.statusValue,
+        orderSn: this.infoForm.order_sn
+      })
+      if(!res.errno) {
         this.getInfo()
         this.statusVisible = false
-      })
+      }
     },
-    handleClick(tab) {
+    async handleClick(tab) {
       const pindex = tab._data.index
       if (+pindex === 1) {
         if (+this.is_finish === 0) {
           this.on_posting = 1
-          this.axios.post('order/getOrderExpress', { orderId: this.infoForm.id }).then(response => {
-            this.expressData = response.data.data
-            this.expressData.traces = JSON.parse(this.expressData.traces)
-            this.is_finish = response.data.data.is_finish
-            this.on_posting = 0
+          let res = await getOrderExpress({
+            orderId: this.infoForm.id
           })
+          if(!res.errno) {
+            this.expressData = res.data
+            this.expressData.traces = JSON.parse(this.expressData.traces)
+            this.is_finish = res.data.is_finish
+            this.on_posting = 0
+          }
         }
       }
     },
-    PackageConfirm() {
-      this.axios
-        .get('order/orderpack', {
-          params: {
-            orderSn: this.infoForm.order_sn
-          }
-        })
-        .then(() => {
-          this.dialogVisible = false
-          this.addressData = []
-          this.getInfo()
-        })
+    async PackageConfirm() {
+      let res = await orderpack({
+        orderSn: this.infoForm.order_sn
+      })
+      if(!res.errno) {
+        this.dialogVisible = false
+        this.addressData = []
+        this.getInfo()
+      }
     },
     goPackage() {
       this.dialogVisible = true
@@ -345,25 +351,20 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       })
-        .then(() => {
-          this.axios.post('order/goodsListDelete', this.goodsData).then(response => {
-            if (response.data.errno === 0) {
-              this.$message({
-                type: 'success',
-                message: '删除成功!'
-              })
-              this.$router.go(-1)
-            }
+        .then(async () => {
+          let res = await goodsListDelete({
+            ...this.goodsData
           })
-        })
-        .catch(() => {
-          //                    this.$message({
-          //                        type: 'info',
-          //                        message: '已取消删除'
-          //                    });
+          if(!res.errno) {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            this.$router.go(-1)
+          }
         })
     },
-    saveGoodsList() {
+    async saveGoodsList() {
       this.goodsData.order_id = this.infoForm.id
       const old = this.oldGoodsNumber
       const now = this.goodsData.number
@@ -381,65 +382,49 @@ export default {
         }
         this.goodsData.number = number
         this.goodsData.addOrMinus = addOrMinus
-        this.axios.post('order/saveGoodsList', this.goodsData).then(response => {
-          console.log(response)
-          //                        this.dialogGoodsListVisible = false;
-          //                        this.infoForm.order_sn = response.data.data;
-          //
-          //                        this.addressData = [];
-          //                        this.getInfo();
+        let res = await saveGoodsList(this.goodsData)
+        if(!res.errno) {
           this.$router.go(-1)
-        })
+        }
       } else {
         this.dialogGoodsListVisible = false
       }
     },
-    saveAdminMemo() {
-      this.axios
-        .post('order/saveAdminMemo', {
-          text: this.infoForm.admin_memo,
-          id: this.infoForm.id
+    async saveAdminMemo() {
+      let res = await saveAdminMemo({
+        text: this.infoForm.admin_memo,
+        id: this.infoForm.id
+      })
+      if(!res.errno) {
+        this.$message({
+          type: 'success',
+          message: '保存成功!'
         })
-        .then(response => {
-          console.log('++---------------------------++')
-          console.log(response)
-          console.log('++---------------------------++')
-          if (response.data.errno === 0) {
-            this.$message({
-              type: 'success',
-              message: '保存成功!'
-            })
-          } else {
-            this.$message({
-              type: 'error',
-              message: '保存失败'
-            })
-          }
+      } else {
+        this.$message({
+          type: 'error',
+          message: '保存失败'
         })
+      }
     },
-    saveAddress() {
+    async saveAddress() {
       this.nowAddressData.order_sn = this.infoForm.order_sn
       this.nowAddressData.addOptions = this.addOptions
-      this.axios.post('order/saveAddress', this.nowAddressData).then(response => {
-        console.log('++---------------------------++')
-        console.log(response)
-        console.log('++---------------------------++')
-        if (response.data.errno === 0) {
-          this.$message({
-            type: 'success',
-            message: '修改成功!'
-          })
-          this.addressData = []
-          this.getInfo()
-
-          this.dialogAddressVisible = false
-        } else {
-          this.$message({
-            type: 'error',
-            message: '修改失败'
-          })
-        }
-      })
+      let res = await saveAddress(this.nowAddressData)
+      if(!res.errno) {
+        this.$message({
+          type: 'success',
+          message: '修改成功!'
+        })
+        this.addressData = []
+        this.getInfo()
+        this.dialogAddressVisible = false
+      } else {
+        this.$message({
+          type: 'error',
+          message: '修改失败'
+        })
+      }
     },
     onSubmitInfo() {
       console.log('onSubmitInfo')
@@ -456,42 +441,36 @@ export default {
       this.oldGoodsNumber = info.number
       this.dialogGoodsListVisible = true
     },
-    getAllRegion() {
-      this.axios.get('order/getAllRegion').then(response => {
-        this.options = response.data.data
-      })
+    async getAllRegion() {
+      let res = await getAllRegion()
+      if(!res.errno) {
+        this.options = res.data
+      }
     },
-    getInfo() {
+    async getInfo() {
       if (this.infoForm.id <= 0) {
         return false
       }
-      this.axios
-        .get('order/detail', {
-          params: {
-            orderId: this.infoForm.id
-          }
-        })
-        .then(response => {
-          console.log('++---------------------------++')
-          console.log(response.data.data)
-          console.log('++---------------------------++')
-          this.infoForm = response.data.data.orderInfo
-          const data = {
-            user_id: this.infoForm.user_id,
-            name: this.infoForm.consignee,
-            nickname: this.infoForm.user_name,
-            avatar: this.infoForm.avatar,
-            mobile: this.infoForm.mobile,
-            postscript: this.infoForm.postscript,
-            address: this.infoForm.full_region + this.infoForm.address,
-            cAddress: this.infoForm.address
-          }
-          this.addressData = []
-          this.addressData.push(data)
-          this.nowAddressData = data
-          this.addOptions.push(this.infoForm.province, this.infoForm.city, this.infoForm.district)
-          console.log(this.infoForm)
-        })
+      let res = await getOrderDetail({
+        orderId: this.infoForm.id
+      })
+      if(!res.errno) {
+        this.infoForm = res.data.orderInfo
+        const data = {
+          user_id: this.infoForm.user_id,
+          name: this.infoForm.consignee,
+          nickname: this.infoForm.user_name,
+          avatar: this.infoForm.avatar,
+          mobile: this.infoForm.mobile,
+          postscript: this.infoForm.postscript,
+          address: this.infoForm.full_region + this.infoForm.address,
+          cAddress: this.infoForm.address
+        }
+        this.addressData = []
+        this.addressData.push(data)
+        this.nowAddressData = data
+        this.addOptions.push(this.infoForm.province, this.infoForm.city, this.infoForm.district)
+      }
     }
   }
 }

@@ -47,8 +47,8 @@
 </template>
 
 <script>
+import { getList } from '@/api/shopCart/shopCart'
 export default {
-  components: {},
   data() {
     return {
       page: 1,
@@ -75,19 +75,16 @@ export default {
       this.page = 1
       this.getList()
     },
-    getList() {
-      this.axios
-        .get('shopcart', {
-          params: {
-            page: this.page,
-            name: this.filterForm.name
-          }
-        })
-        .then(response => {
-          this.tableData = response.data.data.data
-          this.page = response.data.data.currentPage
-          this.total = response.data.data.count
-        })
+    async getList() {
+      let res = await getList({
+        page: this.page,
+        name: this.filterForm.name
+      })
+      if(!res.errno) {
+        this.tableData = res.data.data
+        this.page = res.data.currentPage
+        this.total = res.data.count
+      }
     }
   }
 }

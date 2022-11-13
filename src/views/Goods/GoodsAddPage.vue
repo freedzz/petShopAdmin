@@ -215,8 +215,7 @@ import moment from 'moment'
 import draggable from 'vuedraggable'
 import $ from 'jquery'
 import { quillEditor } from 'vue-quill-editor'
-// import ElForm from '../../../../node_modules/element-ui/packages/form/src/form.vue'
-// import ElFormItem from '../../../../node_modules/element-ui/packages/form/src/form-item.vue' // 调用富文本编辑器
+import { checkSku, goodsStore, uploadHttpsImage, getGoodsSpec, getQiniuToken, getGalleryList, copygoods, goodsInfo, getAllCategory, getAllSpecification, getExpressData } from '@/api/goods/goods'
 const toolbarOptions = [
   ['bold', 'italic', 'underline', 'strike'],
   ['blockquote'],
@@ -401,18 +400,15 @@ export default {
           console.log(err)
         })
     },
-    handleUploadListSuccess(res) {
+    async handleUploadListSuccess(res) {
       const url = this.url
       this.infoForm.list_pic_url = url + res.key
-      console.log(this.infoForm.list_pic_url)
-      this.axios
-        .post('goods/uploadHttpsImage', {
-          url: this.infoForm.list_pic_url
-        })
-        .then(response => {
-          const lastUrl = response.data.data
-          this.infoForm.https_pic_url = lastUrl
-        })
+      let res2 = await uploadHttpsImage({
+        url: this.infoForm.list_pic_url
+      })
+      if(!res2.errno) {
+        this.infoForm.https_pic_url = res2.data
+      }
     },
     onRemoveHandler(index) {
       const that = this
@@ -476,9 +472,7 @@ export default {
     beforeRemove(file) {
       return this.$confirm(`确定移除 ${file.name}？`)
     },
-    checkSkuOnly(index, row) {
-      console.log(index)
-      console.log(row)
+    async checkSkuOnly(index, row) {
       if (!row.goods_sn) {
         this.$message({
           type: 'error',
@@ -486,37 +480,30 @@ export default {
         })
         return false
       }
-      this.axios
-        .post('goods/checkSku', {
-          info: row
+      let res = await checkSku({
+        info: row
+      })
+      if(!res.errno) {
+        this.$message({
+          type: 'error',
+          message: '该SKU已存在！'
         })
-        .then(response => {
-          if (response.data.errno === 100) {
-            this.$message({
-              type: 'error',
-              message: '该SKU已存在！'
-            })
-          } else {
-            this.$message({
-              type: 'success',
-              message: '该SKU可以用！'
-            })
-          }
+      } else {
+        this.$message({
+          type: 'success',
+          message: '该SKU可以用！'
         })
+      }
     },
-    getSpecData() {
-      const id = this.infoForm.id
-      this.axios
-        .post('specification/getGoodsSpec', {
-          id: id
-        })
-        .then(response => {
-          if (response.data.errno === 0) {
-            const info = response.data.data
-            this.specData = info.specData
-            this.specValue = info.specValue
-          }
-        })
+    async getSpecData() {
+      let res = await getGoodsSpec({
+        id: this.infoForm.id
+      })
+      if(!res.errno) {
+        const info = res.data
+        this.specData = info.specData
+        this.specValue = info.specValue
+      }
     },
     addSpecData() {
       const ele = {
@@ -538,13 +525,13 @@ export default {
     hasErrorAct(err) {
       console.log(err)
     },
-    getQiniuToken() {
-      const that = this
-      this.axios.post('index/getQiniuToken').then(response => {
-        const resInfo = response.data.data
-        that.picData.token = resInfo.token
-        that.url = resInfo.url
-      })
+    async getQiniuToken() {
+      let res = await getQiniuToken()
+      if(!res.errno) {
+        const resInfo = res.data
+        this.picData.token = resInfo.token
+        this.url = resInfo.url
+      }
     },
     specChange(value) {
       this.specForm.id = value
@@ -603,15 +590,13 @@ export default {
       this.dialogImageUrl = file.url
       this.dialogVisible = true
     },
-    getGalleryList() {
-      const goodsId = this.infoForm.id
-      this.axios
-        .post('goods/getGalleryList', {
-          goodsId: goodsId
-        })
-        .then(response => {
-          this.gallery_list = response.data.data.galleryData
-        })
+    async getGalleryList() {
+      let res = await getGalleryList({
+        goodsId: this.infoForm.id
+      })
+      if(!res.errno) {
+        this.gallery_list = res.data.galleryData
+      }
     },
     kdChange(kdValue) {
       this.infoForm.freight_template_id = kdValue
@@ -655,25 +640,20 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.axios
-          .post('goods/copygoods', {
-            id: this.infoForm.id
+      }).then(async () => {
+        let res = await copygoods({
+          id: this.infoForm.id
+        })
+        if(!res.errno) {
+          this.$message({
+            type: 'success',
+            message: '复制成功!'
           })
-          .then(response => {
-            if (response.data.errno === 0) {
-              this.$message({
-                type: 'success',
-                message: '复制成功!'
-              })
-              //                            this.is_has_spec = false;
-              //                            this.specData = [];
-            }
-          })
+        }
       })
     },
     onSubmitInfo() {
-      this.$refs.infoForm.validate(valid => {
+      this.$refs.infoForm.validate(async (valid) => {
         if (valid) {
           if (!this.infoForm.list_pic_url) {
             this.$message({
@@ -707,29 +687,25 @@ export default {
           }
           this.infoForm.gallery = this.gallery_list
           // return false;
-          this.axios
-            .post('goods/store', {
-              info: this.infoForm,
-              specData: this.specData,
-              specValue: this.specValue,
-              cateId: this.cateId
+          let res = await goodsStore({
+            info: this.infoForm,
+            specData: this.specData,
+            specValue: this.specValue,
+            cateId: this.cateId
+          })
+          if(!res.errno) {
+            this.$message({
+              type: 'success',
+              message: '保存成功'
             })
-            .then(response => {
-              if (response.data.errno === 0) {
-                this.$message({
-                  type: 'success',
-                  message: '保存成功'
-                })
-                this.infoForm.id = response.data.data
-                this.getGalleryList()
-                // this.$router.go(-1);
-              } else {
-                this.$message({
-                  type: 'error',
-                  message: '保存失败'
-                })
-              }
+            this.infoForm.id = res.data
+            this.getGalleryList()
+          } else {
+            this.$message({
+              type: 'error',
+              message: '保存失败'
             })
+          }
         } else {
           return false
         }
@@ -772,60 +748,51 @@ export default {
       // loading动画消失
       this.quillUpdateImg = false
     },
-    getInfo() {
+    async getInfo() {
       if (this.infoForm.id <= 0) {
         return false
       }
       // 加载商品详情
-      const that = this
-      this.axios
-        .get('goods/info', {
-          params: {
-            id: that.infoForm.id
-          }
-        })
-        .then(response => {
-          const resInfo = response.data.data
-          const goodsInfo = resInfo.info
-          // goodsInfo.is_index = goodsInfo.is_index ? true : false;
-          goodsInfo.is_new = !!goodsInfo.is_new
-          goodsInfo.is_on_sale = goodsInfo.is_on_sale ? '1' : '0'
-          that.infoForm = goodsInfo
-          that.kdValue = goodsInfo.freight_template_id
-          that.cateId = resInfo.category_id
-          that.getImgUrl()
-        })
+      let res = await goodsInfo({
+        id: this.infoForm.id
+      })
+      if(!res.errno) {
+        const resInfo = res.data
+        const goodsInfo = resInfo.info
+        // goodsInfo.is_index = goodsInfo.is_index ? true : false;
+        goodsInfo.is_new = !!goodsInfo.is_new
+        goodsInfo.is_on_sale = goodsInfo.is_on_sale ? '1' : '0'
+        this.infoForm = goodsInfo
+        this.kdValue = goodsInfo.freight_template_id
+        this.cateId = resInfo.category_id
+        this.getImgUrl()
+      }
     },
     // 获取所有分类
-    getAllCategory() {
-      const that = this
-      this.axios
-        .get('goods/getAllCategory', {
-          params: {}
-        })
-        .then(response => {
-          that.options = response.data.data
-        })
-    },
-    getAllSpecification() {
-      const that = this
-      this.axios.get('goods/getAllSpecification').then(response => {
-        const resInfo = response.data.data
-        console.log(resInfo)
-        that.specOptionsList = resInfo
+    async getAllCategory() {
+      let res = await getAllCategory({
+        params: {}
       })
+      if(!res.errno) {
+        this.options = res.data
+      }
     },
-    getExpressData() {
-      const that = this
-      this.axios
-        .get('goods/getExpressData', {
-          params: {}
-        })
-        .then(response => {
-          const options = response.data.data
-          that.kdOptions = options.kd
-          that.cateOptions = options.cate
-        })
+    async getAllSpecification() {
+      let res = await getAllSpecification()
+      if(!res.errno) {
+        const resInfo = res.data
+        this.specOptionsList = resInfo
+      }
+    },
+    async getExpressData() {
+      let res = await getExpressData({
+        params: {}
+      })
+      if(!res.errno) {
+        const options = res.data
+        this.kdOptions = options.kd
+        this.cateOptions = options.cate
+      }
     },
     // summernote 上传图片，返回链接
     sendFile() {

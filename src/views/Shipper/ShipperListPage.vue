@@ -64,6 +64,7 @@
 </template>
 
 <script>
+import { updateSort, shipperDestory, shipperList, enabledStatus } from '@/api/shipper/shipper'
 export default {
   components: {},
   data() {
@@ -80,10 +81,14 @@ export default {
     this.getList()
   },
   methods: {
-    submitSort(index, row) {
-      this.axios.post('shipper/updateSort', { id: row.id, sort: row.sort_order }).then(response => {
-        console.log(response)
+    async submitSort(index, row) {
+      let res = await updateSort({
+        id: row.id,
+        sort: row.sort_order
       })
+      if(!res.errno) {
+        console.log(res)
+      }
     },
     goBackPage() {
       this.$router.go(-1)
@@ -106,55 +111,52 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.axios.post('shipper/destory', { id: row.id }).then(response => {
-          console.log(response.data)
-          if (response.data.errno === 0) {
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
-            this.getList()
-          }
+      }).then(async () => {
+        let res = await shipperDestory({
+          id: row.id
         })
+        if(!res.errno) {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          this.getList()
+        }
       })
     },
     onSubmitFilter() {
       this.page = 1
       this.getList()
     },
-    getList() {
-      this.axios
-        .get('shipper/list', {
-          params: {
-            page: this.page,
-            name: this.filterForm.name
-          }
-        })
-        .then(response => {
-          this.tableData = response.data.data.data
-          this.page = response.data.data.currentPage
-          this.total = response.data.data.count
-          console.log(this.tableData)
-          for (const item of this.tableData) {
-            item.enabled = !!item.enabled
-          }
-        })
+    async getList() {
+      let res = await shipperList({
+        params: {
+          page: this.page,
+          name: this.filterForm.name
+        }
+      })
+      if(!res.errno) {
+        this.tableData = res.data.data
+        this.page = res.data.currentPage
+        this.total = res.data.count
+        for (const item of this.tableData) {
+          item.enabled = !!item.enabled
+        }
+      }
     },
-    changeStatus($event, para) {
-      this.axios
-        .get('shipper/enabledStatus', {
-          params: {
-            status: $event,
-            id: para
-          }
+    async changeStatus($event, para) {
+      let res = await enabledStatus({
+        params: {
+          status: $event,
+          id: para
+        }
+      })
+      if(!res.errno) {
+        this.$message({
+          type: 'success',
+          message: '更新成功!'
         })
-        .then(() => {
-          this.$message({
-            type: 'success',
-            message: '更新成功!'
-          })
-        })
+      }
     }
   }
 }

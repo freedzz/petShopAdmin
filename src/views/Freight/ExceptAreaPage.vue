@@ -31,7 +31,7 @@
 </template>
 
 <script>
-
+import { getExceptarea, exceptAreaDelete } from '@/api/freight/freight'
 export default {
   components: {},
   data() {
@@ -63,24 +63,24 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.axios.post('shipper/exceptAreaDelete', { id: row.id }).then(response => {
-          console.log(response.data)
-          if (response.data.errno === 0) {
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
-            this.getInfo()
-          }
+      }).then(async () => {
+        let res = await exceptAreaDelete({
+          id: row.id
         })
+        if(!res.errno) {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          this.getInfo()
+        }
       })
     },
-    getInfo() {
-      const that = this
-      this.axios.get('shipper/exceptarea').then(response => {
-        that.tableData = response.data.data
-      })
+    async getInfo() {
+      let res = await getExceptarea()
+      if(!res.errno) {
+        this.tableData = res.data
+      }
     }
   }
 }

@@ -164,9 +164,8 @@
   </div>
 </template>
 <script>
-import api from '@/config/api'
 import Clipboard from 'clipboard'
-
+import { orderPrice, getOrderDetail, getDeliveyInfo, getOrderpack, deliveryGoGo, getOrder } from '@/api/order/order'
 export default {
   components: {},
   data() {
@@ -200,7 +199,6 @@ export default {
   mounted() {
     this.getList()
     this.getDeliveyInfo()
-    this.root = api.rootUrl
   },
   methods: {
     deliveryMethodChange(val) {
@@ -210,31 +208,26 @@ export default {
         this.isShow = false
       }
     },
-    priceChangeConfirm() {
-      this.axios
-        .get('order/orderPrice', {
-          params: {
-            orderSn: this.order_sn,
-            goodsPrice: this.orderInfo.goods_price,
-            kdPrice: this.orderInfo.freight_price
-          }
-        })
-        .then(() => {
-          this.dialogPriceVisible = false
-          this.getList()
-        })
+    async priceChangeConfirm() {
+      let res = await orderPrice({
+        params: {
+          orderSn: this.order_sn,
+          goodsPrice: this.orderInfo.goods_price,
+          kdPrice: this.orderInfo.freight_price
+        }
+      })
+      if(!res.errno) {
+        this.dialogPriceVisible = false
+        this.getList()
+      }
     },
-    getOrderInfo() {
-      this.axios
-        .get('order/detail', {
-          params: {
-            orderSn: this.order_sn
-          }
-        })
-        .then(response => {
-          this.orderInfo = response.data.data
-          console.log(this.orderInfo)
-        })
+    async getOrderInfo() {
+      let res = await getOrderDetail({
+        orderSn: this.order_sn
+      })
+      if(!res.errno) {
+        this.orderInfo = res.data
+      }
     },
     copyit(item) {
       console.log(item)
@@ -292,58 +285,52 @@ export default {
         this.dialogPriceVisible = true
       }
     },
-    getDeliveyInfo() {
-      this.axios.get('delivery').then(response => {
-        this.deliveryCom = response.data.data
-        console.log(this.deliveryCom)
+    async getDeliveyInfo() {
+      let res = await getDeliveyInfo()
+      if(!res.errno) {
+        this.deliveryCom = res.data
+      }
+    },
+    async confirm() {
+      let res = await getOrderpack({
+        params: {
+          orderSn: this.order_sn
+        }
       })
+      if(!res.errno) {
+        this.dialogVisible = false
+        this.getList()
+      }
     },
-    confirm() {
-      this.axios
-        .get('order/orderpack', {
-          params: {
-            orderSn: this.order_sn
-          }
-        })
-        .then(() => {
-          this.dialogVisible = false
-          this.getList()
-        })
-    },
-    deliveyGoConfirm() {
-      this.axios
-        .get('order/orderDelivery', {
-          params: {
-            orderSn: this.order_sn,
-            shipper: this.nowDeliveryId,
-            method: this.dform.method,
-            logistic_code: this.dform.logistic_code
-          }
-        })
-        .then(() => {
-          this.dialogFormVisible = false
-          this.getList()
-        })
-
+    async deliveyGoConfirm() {
+      let res = await deliveryGoGo({
+        params: {
+          orderSn: this.order_sn,
+          shipper: this.nowDeliveryId,
+          method: this.dform.method,
+          logistic_code: this.dform.logistic_code
+        }
+      })
+      if(!res.errno) {
+        this.dialogFormVisible = false
+        this.getList()
+      }
       this.dialogFormVisible = false
     },
-    getList() {
-      console.log(this.order_status)
-      this.axios
-        .get('order', {
-          params: {
-            page: this.page,
-            orderSn: this.filterForm.order_sn,
-            consignee: this.filterForm.consignee,
-            status: this.order_status
-          }
-        })
-        .then(response => {
-          this.tableData = response.data.data.data
-          console.log()
-          this.page = response.data.data.currentPage
-          this.total = response.data.data.count
-        })
+    async getList() {
+      let res = await getOrder({
+        params: {
+          page: this.page,
+          orderSn: this.filterForm.order_sn,
+          consignee: this.filterForm.consignee,
+          status: this.order_status
+        }
+      })
+      if(!res.errno) {
+        this.tableData = res.data.data
+        this.page = res.data.currentPage
+        this.total = res.data.count
+      }
     }
   }
 }

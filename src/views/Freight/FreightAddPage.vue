@@ -224,7 +224,7 @@
 </template>
 
 <script>
-// import api from '@/config/api'
+import { getareadata, freightdetail, addTable, saveTable } from '@/api/freight/freight'
 
 export default {
   components: {},
@@ -330,16 +330,6 @@ export default {
 
       const areaName = this.selectedArea
 
-      // let i = 0;
-      // for (const item of areaName) {
-      //     all.map((ele) => ele.id == item ? areaName[i] = ele.name : '')
-      //     i++;
-      // }
-
-      // for (const item in areaName) {
-      //     all.map((ele) => ele.id == areaName[item] ? areaName[item] = ele.name : '')
-      // }
-
       const newName = []
       for (const item in areaName) {
         all.map(ele => +ele.id === areaName[item] ? newName.push(ele.name) : '')
@@ -356,12 +346,9 @@ export default {
       console.log('--------')
       that.specEditVisible = false
     },
-    onSaveTemplate() {
+    async onSaveTemplate() {
       const name = this.infoForm.name
       const defa = this.defaultData
-
-      // console.log(this.tableData);
-
       if (!name) {
         this.$message({
           type: 'error',
@@ -386,9 +373,7 @@ export default {
           return false
         }
       }
-
       const data = this.tableData
-
       for (const ele of data) {
         if (ele.start === 0 || ele.add === 0 || ele.start_fee < 0 || ele.add_fee < 0) {
           this.$message({
@@ -405,31 +390,25 @@ export default {
           return false
         }
       }
-
-      const that = this
-      this.axios
-        .post('shipper/saveTable', {
-          table: that.tableData,
-          defaultData: that.defaultData,
-          info: that.infoForm
+      let res = await saveTable({
+        table: this.tableData,
+        defaultData: this.defaultData,
+        info: this.infoForm
+      })
+      if (res.errno === 0) {
+        this.$message({
+          type: 'success',
+          message: '保存成功'
         })
-        .then(response => {
-          if (response.data.errno === 0) {
-            this.$message({
-              type: 'success',
-              message: '保存成功'
-            })
-            that.getInfo()
-          } else {
-            this.$message({
-              type: 'error',
-              message: '保存失败'
-            })
-          }
+        this.getInfo()
+      } else {
+        this.$message({
+          type: 'error',
+          message: '保存失败'
         })
+      }
     },
-
-    onAddTemplate() {
+    async onAddTemplate() {
       const name = this.infoForm.name
       const defa = this.defaultData
       if (!name) {
@@ -475,29 +454,23 @@ export default {
           return false
         }
       }
-
-      const that = this
-
-      this.axios
-        .post('shipper/addTable', {
-          table: that.tableData,
-          defaultData: that.defaultData,
-          info: that.infoForm
+      let res = await addTable({
+        table: this.tableData,
+        defaultData: this.defaultData,
+        info: this.infoForm
+      })
+      if (res.errno === 0) {
+        this.$message({
+          type: 'success',
+          message: '添加成功'
         })
-        .then(response => {
-          if (response.data.errno === 0) {
-            that.$message({
-              type: 'success',
-              message: '添加成功'
-            })
-            that.$router.go(-1)
-          } else {
-            that.$message({
-              type: 'error',
-              message: '添加失败'
-            })
-          }
+        this.$router.go(-1)
+      } else {
+        this.$message({
+          type: 'error',
+          message: '添加失败'
         })
+      }
     },
 
     deleteRow(index, rows) {
@@ -507,17 +480,6 @@ export default {
         type: 'warning'
       }).then(() => {
         rows.splice(index, 1)
-        // this.axios.post('ad/destory', { id: row.id }).then((response) => {
-        //     console.log(response.data)
-        //     if (response.data.errno === 0) {
-        //         this.$message({
-        //             type: 'success',
-        //             message: '删除成功!'
-        //         });
-        //
-        //         this.getList();
-        //     }
-        // })
       })
     },
     test() {
@@ -539,19 +501,16 @@ export default {
     goBackPage() {
       this.$router.go(-1)
     },
-    getAllAreaData() {
-      const that = this
-      this.axios.post('shipper/getareadata').then(response => {
-        if (response.data.errno === 0) {
-          that.areaData = response.data.data
-          // console.log(that.areaData);
-          // let otherArea =
-          // 建立一个新的组，这个组是所有已选择的地区的组合，每次操作都要去重新变化这个数组
-          // tableData中将数据中的area集合在一起
-          // 然后将这些area的地区从all将已存在的disable，
-          // 从右到左时，应该要将那个值从all中恢复掉
-        }
-      })
+    async getAllAreaData() {
+      let res = await getareadata()
+      if (!res.errno) {
+        this.areaData = res.data
+        // let otherArea =
+        // 建立一个新的组，这个组是所有已选择的地区的组合，每次操作都要去重新变化这个数组
+        // tableData中将数据中的area集合在一起
+        // 然后将这些area的地区从all将已存在的disable，
+        // 从右到左时，应该要将那个值从all中恢复掉
+      }
     },
     handleRowEdit(index) {
       // console.log(row.id);
@@ -587,36 +546,28 @@ export default {
 
       this.specEditVisible = true
     },
-
-    getAreaData() {
-      const that = this
-      this.axios
-        .post('shipper/freightdetail', {
-          id: that.infoForm.id
-        })
-        .then(response => {
-          that.infoForm = response.data.data.freight
-          that.tableData = response.data.data.data
-          // console.log(this.tableData);
-          // that.defaultData = response.data.data.defaultData;
-        })
+    async getAreaData() {
+      let res = await freightdetail({
+        id: this.infoForm.id
+      })
+      if (!res.errno) {
+        this.infoForm = res.data.freight
+        this.tableData = res.data.data
+      }
     },
-    getInfo() {
+    async getInfo() {
       if (this.infoForm.id <= 0) {
         return false
       }
       // 加载快递公司详情
-      const that = this
-      this.axios
-        .post('shipper/freightdetail', {
-          id: that.infoForm.id
-        })
-        .then(response => {
-          that.infoForm = response.data.data.freight
-          that.tableData = response.data.data.data
-          that.defaultData = response.data.data.defaultData
-          console.log(that.defaultData)
-        })
+      let res = await freightdetail({
+        id: this.infoForm.id
+      })
+      if (!res.errno) {
+        this.infoForm = res.data.freight
+        this.tableData = res.data.data
+        this.defaultData = res.data.defaultData
+      }
     }
   }
 }

@@ -49,6 +49,7 @@
 </template>
 
 <script>
+import { getShipper, storeShipperSettings, changeAutoStatus, getAllRegion } from '@/api/shipper/shipper'
 export default {
   components: {},
   data() {
@@ -77,27 +78,29 @@ export default {
     this.getAllRegion()
   },
   methods: {
-    getAllRegion() {
-      this.axios.get('order/getAllRegion').then(response => {
-        this.options = response.data.data
-      })
+    async getAllRegion() {
+      let res = await getAllRegion()
+      if(!res.errno) {
+        this.options = res.data
+      }
     },
-    changeStatus() {
+    async changeStatus() {
       this.infoForm.autoDelivery = this.infoForm.autoDelivery ? 1 : 0
-      this.axios.post('admin/changeAutoStatus', { status: this.infoForm.autoDelivery }).then(response => {
-        if (response.data.errno === 0) {
-          this.$message({
-            type: 'success',
-            message: '更改成功'
-          })
-          this.infoForm.autoDelivery = this.infoForm.autoDelivery ? true : false
-        } else {
-          this.$message({
-            type: 'error',
-            message: '更改失败'
-          })
-        }
+      let res = await changeAutoStatus({
+        status: this.infoForm.autoDelivery
       })
+      if(!res.errno) {
+        this.$message({
+          type: 'success',
+          message: '更改成功'
+        })
+        this.infoForm.autoDelivery = this.infoForm.autoDelivery ? true : false
+      } else {
+        this.$message({
+          type: 'error',
+          message: '更改失败'
+        })
+      }
     },
     handleRowEdit(index, row) {
       this.$router.push({ name: 'shipper_add', query: { id: row.id } })
@@ -107,34 +110,34 @@ export default {
       this.infoForm.city_id = this.senderOptions[1]
       this.infoForm.district_id = this.senderOptions[2]
       this.infoForm.autoDelivery = this.infoForm.autoDelivery ? 1 : 0
-      this.$refs.infoForm.validate(valid => {
+      this.$refs.infoForm.validate(async (valid) => {
         if (valid) {
-          this.axios.post('admin/storeShipperSettings', this.infoForm).then(response => {
-            if (response.data.errno === 0) {
-              this.$message({
-                type: 'success',
-                message: '保存成功'
-              })
-              this.infoForm.autoDelivery = this.infoForm.autoDelivery ? true : false
-            } else {
-              this.$message({
-                type: 'error',
-                message: '保存失败'
-              })
-            }
-          })
+          let res = await storeShipperSettings(this.infoForm)
+          if(!res.errno) {
+            this.$message({
+              type: 'success',
+              message: '保存成功'
+            })
+            this.infoForm.autoDelivery = this.infoForm.autoDelivery ? true : false
+          } else {
+            this.$message({
+              type: 'error',
+              message: '保存失败'
+            })
+          }
         } else {
           return false
         }
       })
     },
-    getList() {
-      this.axios.get('shipper').then(response => {
-        this.infoForm = response.data.data.set
-        this.tableData = response.data.data.info
+    async getList() {
+      let res = await getShipper()
+      if(!res.errno) {
+        this.infoForm = res.data.set
+        this.tableData = res.data.info
         this.infoForm.autoDelivery = this.infoForm.autoDelivery ? true : false
         this.senderOptions.push(this.infoForm.province_id, this.infoForm.city_id, this.infoForm.district_id)
-      })
+      }
     }
   }
 }

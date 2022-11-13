@@ -4,12 +4,9 @@
   </span>
 </template>
 <script>
+import { getIndexInfo } from '@/api/welcome/welcome'
 export default {
   props: {
-    // endTime: {
-    //     type: String,
-    //     default: ''
-    // },
     endText: {
       type: String,
       default: '已结束'
@@ -29,14 +26,14 @@ export default {
     this.getInfo()
   },
   methods: {
-    getInfo() {
-      this.axios.get('index').then(response => {
-        console.log(response)
-        this.infoData = response.data.data
-        let time = response.data.data.timestamp
+    async getInfo() {
+      let res = await getIndexInfo()
+      if(!res.errno) {
+        this.infoData = res.data
+        let time = res.data.timestamp
         this.endTime = time.toString()
         this.countdowm(this.endTime)
-      })
+      }
     },
     countdowm(timestamp) {
       let self = this

@@ -168,6 +168,7 @@
 </template>
 
 <script>
+import { updateStockByHand, updateGoodsNumber, updatePrice, checkSku, updateShortName, updateSort, goodDestory, getGood, onsale, out, drop, sort, saleStatus, productStatus, indexShowStatus} from '@/api/goods/goods'
 export default {
   components: {},
   data() {
@@ -217,29 +218,27 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.axios.post('crontab/updateStockByHand').then(response => {
-          if (response.data.errno === 0) {
-            this.$message({
-              type: 'success',
-              message: '同步成功'
-            })
-            this.getOnSaleList()
-          }
-        })
-      })
-    },
-    updateGoodsNumber() {
-      this.axios.post('goods/updateGoodsNumber').then(response => {
-        if (response.data.errno === 0) {
+      }).then(async () => {
+        let res = await updateStockByHand()
+        if(!res.errno) {
           this.$message({
             type: 'success',
-            message: '同步成功2/2，完成'
+            message: '同步成功'
           })
+          this.getOnSaleList()
         }
       })
     },
-    specSave(index, row) {
+    async updateGoodsNumber() {
+      let res = await updateGoodsNumber()
+      if(!res.errno) {
+        this.$message({
+          type: 'success',
+          message: '同步成功2/2，完成'
+        })
+      }
+    },
+    async specSave(index, row) {
       if (row.goods_name === '' || row.value === '' || row.cost === '' || row.retail_price === '' || row.goods_weight === '') {
         this.$message({
           type: 'error',
@@ -247,23 +246,20 @@ export default {
         })
         return false
       }
-      this.axios.post('goods/updatePrice', row).then(response => {
-        if (response.data.errno === 0) {
-          this.$message({
-            type: 'success',
-            message: '修改成功!'
-          })
-        } else if (response.data.errno === 100) {
-          this.$message({
-            type: 'error',
-            message: response.data.errmsg
-          })
-        }
-      })
+      let res = await updatePrice(row)
+      if(!res.errno) {
+        this.$message({
+          type: 'success',
+          message: '修改成功!'
+        })
+      } else {
+        this.$message({
+          type: 'error',
+          message: res.errmsg
+        })
+      }
     },
-    checkSkuOnly(index, row) {
-      console.log(index)
-      console.log(row)
+    async checkSkuOnly(index, row) {
       if (!row.goods_sn) {
         this.$message({
           type: 'error',
@@ -271,19 +267,18 @@ export default {
         })
         return false
       }
-      this.axios.post('goods/checkSku', { info: row }).then(response => {
-        if (response.data.errno === 100) {
-          this.$message({
-            type: 'error',
-            message: '该SKU已存在！'
-          })
-        } else {
-          this.$message({
-            type: 'success',
-            message: '该SKU可以用！'
-          })
-        }
-      })
+      let res = await checkSku({ info: row })
+      if(res.errno === 100) {
+        this.$message({
+          type: 'error',
+          message: '该SKU已存在！'
+        })
+      } else {
+        this.$message({
+          type: 'success',
+          message: '该SKU可以用！'
+        })
+      }
     },
     expandToggle() {
       this.expand = !this.expand
@@ -291,20 +286,20 @@ export default {
     test() {
       console.log(this.tableData)
     },
-    submitName(index, row) {
-      this.axios.post('goods/updateShortName', { id: row.id, short_name: row.short_name }).then(response => {
-        if (response.data.errno === 0) {
-          this.$message({
-            type: 'success',
-            message: '修改成功!'
-          })
-        }
-      })
+    async submitName(index, row) {
+      let res = await updateShortName({ id: row.id, short_name: row.short_name })
+      if(!res.errno) {
+        this.$message({
+          type: 'success',
+          message: '修改成功!'
+        })
+      }
     },
-    submitSort(index, row) {
-      this.axios.post('goods/updateSort', { id: row.id, sort: row.sort_order }).then(response => {
-        console.log(response)
-      })
+    async submitSort(index, row) {
+      let res = await updateSort({ id: row.id, sort: row.sort_order })
+      if(!res.errno) {
+        console.log(res)
+      }
     },
     handleClick(tab) {
       const pindex = tab._data.index
@@ -348,163 +343,128 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       })
-        .then(() => {
-          const that = this
-          that.axios.post('goods/destory', { id: row.id }).then(response => {
-            if (response.data.errno === 0) {
-              that.$message({
-                type: 'success',
-                message: '删除成功!'
-              })
-              const pIndex = localStorage.getItem('pIndex')
-              console.log(pIndex)
-              if (+pIndex === 0) {
-                that.getList()
-              } else if (+pIndex === 1) {
-                that.getOnSaleList()
-              } else if (+pIndex === 2) {
-                that.getOutList()
-              } else if (+pIndex === 3) {
-                that.getDropList()
-              }
+        .then(async () => {
+          let res = await goodDestory({ id: row.id })
+          if(!res.errno) {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            const pIndex = localStorage.getItem('pIndex')
+
+            if (+pIndex === 0) {
+              this.getList()
+            } else if (+pIndex === 1) {
+              this.getOnSaleList()
+            } else if (+pIndex === 2) {
+              this.getOutList()
+            } else if (+pIndex === 3) {
+              this.getDropList()
             }
-          })
-        })
-        .catch(() => {
-          //                    this.$message({
-          //                        type: 'info',
-          //                        message: '已取消删除'
-          //                    });
+          }
         })
     },
     onSubmitFilter() {
       this.page = 1
       this.getList()
     },
-    clear() {
-      this.axios
-        .get('goods', {
-          params: {
-            page: this.page,
-            name: ''
-          }
-        })
-        .then(response => {
-          this.tableData = response.data.data.data
-          this.page = response.data.data.currentPage
-          this.total = response.data.data.count
-        })
+    async clear() {
+      let res = await getGood({
+        page: this.page,
+        name: ''
+      })
+      if(!res.errno) {
+        this.tableData = res.data.data
+        this.page = res.data.currentPage
+        this.total = res.data.count
+      }
     },
-    getList() {
-      this.axios
-        .get('goods', {
-          params: {
-            page: this.page,
-            size: this.size,
-            name: this.filterForm.name
-          }
-        })
-        .then(response => {
-          this.tableData = response.data.data.data
-          this.page = response.data.data.currentPage
-          this.total = response.data.data.count
-        })
+    async getList() {
+      let res = await getGood({
+        page: this.page,
+        size: this.size,
+        name: this.filterForm.name
+      })
+      if(!res.errno) {
+        this.tableData = res.data.data
+        this.page = res.data.currentPage
+        this.total = res.data.count
+      }
     },
-    getOnSaleList() {
-      this.axios
-        .get('goods/onsale', {
-          params: {
-            page: this.page,
-            size: this.size
-          }
-        })
-        .then(response => {
-          this.tableData = response.data.data.data
-          this.page = response.data.data.currentPage
-          this.total = response.data.data.count
-        })
+    async getOnSaleList() {
+      let res = await onsale({
+        page: this.page,
+        size: this.size
+      })
+      if(!res.errno) {
+        this.tableData = res.data.data
+        this.page = res.data.currentPage
+        this.total = res.data.count
+      }
     },
-    getOutList() {
-      this.axios
-        .get('goods/out', {
-          params: {
-            page: this.page,
-            size: this.size
-          }
-        })
-        .then(response => {
-          this.tableData = response.data.data.data
-          this.page = response.data.data.currentPage
-          this.total = response.data.data.count
-        })
+    async getOutList() {
+      let res = await out({
+        page: this.page,
+        size: this.size
+      })
+      if(!res.errno) {
+        this.tableData = res.data.data
+        this.page = res.data.currentPage
+        this.total = res.data.count
+      }
     },
-    getDropList() {
-      this.axios
-        .get('goods/drop', {
-          params: {
-            page: this.page,
-            size: this.size
-          }
-        })
-        .then(response => {
-          this.tableData = response.data.data.data
-          this.page = response.data.data.currentPage
-          this.total = response.data.data.count
-        })
+    async getDropList() {
+      let res = await drop({
+        page: this.page,
+        size: this.size
+      })
+      if(!res.errno) {
+        this.tableData = res.data.data
+        this.page = res.data.currentPage
+        this.total = res.data.count
+      }
     },
-    sortOrder(num) {
+    async sortOrder(num) {
       this.num = num
       this.pIndex = 4
       this.activeClass = num
-      this.axios
-        .get('goods/sort', {
-          params: {
-            page: this.page,
-            size: this.size,
-            index: num
-          }
-        })
-        .then(response => {
-          this.tableData = response.data.data.data
-          this.page = response.data.data.currentPage
-          this.total = response.data.data.count
-        })
+      let res = await sort({
+        page: this.page,
+        size: this.size,
+        index: num
+      })
+      if(!res.errno) {
+        this.tableData = res.data.data
+        this.page = res.data.currentPage
+        this.total = res.data.count
+      }
     },
-    changeStatus($event, para) {
-      this.axios
-        .get('goods/saleStatus', {
-          params: {
-            status: $event,
-            id: para
-          }
-        })
-        .then(response => {
-          console.log(response)
-        })
+    async changeStatus($event, para) {
+      let res = await saleStatus({
+        status: $event,
+        id: para
+      })
+      if(!res.errno) {
+        console.log(res)
+      }
     },
-    changeProductStatus($event, para) {
-      this.axios
-        .get('goods/productStatus', {
-          params: {
-            status: $event,
-            id: para
-          }
-        })
-        .then(response => {
-          console.log(response)
-        })
+    async changeProductStatus($event, para) {
+      let res = await productStatus({
+        status: $event,
+        id: para
+      })
+      if(!res.errno) {
+        console.log(res)
+      }
     },
-    changeShowStatus($event, para) {
-      this.axios
-        .get('goods/indexShowStatus', {
-          params: {
-            status: $event,
-            id: para
-          }
-        })
-        .then(response => {
-          console.log(response)
-        })
+    async changeShowStatus($event, para) {
+      let res = await indexShowStatus({
+        status: $event,
+        id: para
+      })
+      if(!res.errno) {
+        console.log(res)
+      }
     }
   }
 }

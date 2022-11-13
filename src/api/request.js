@@ -13,6 +13,7 @@ export default function request ({ method, url, data, headers = {}, config = {},
   }
   switch (method) {
   case 'GET':
+  case 'get':
     return axios({
       method,
       url: `${url}?${qs.stringify(data)}`,
@@ -20,6 +21,7 @@ export default function request ({ method, url, data, headers = {}, config = {},
       ...config
     })
   case 'POST':
+  case 'post':
     return axios({
       method,
       url,

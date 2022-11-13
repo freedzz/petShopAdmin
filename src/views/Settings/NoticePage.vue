@@ -47,6 +47,7 @@
 </template>
 
 <script>
+import { getNotice, noticeDestory, updateContent, noticeAdd, noticeUpdate } from '@/api/settings/settings'
 export default {
   components: {},
   data() {
@@ -67,8 +68,7 @@ export default {
     test() {
       console.log(this.noticeData)
     },
-    updateNotice() {
-      console.log(this.noticeData)
+    async updateNotice() {
       if (!this.noticeData.content) {
         this.$message({
           type: 'error',
@@ -82,24 +82,22 @@ export default {
         })
         return false
       }
-      this.axios.post('notice/update', this.noticeData).then(response => {
-        if (response.data.errno === 0) {
-          this.$message({
-            type: 'success',
-            message: '添加成功!'
-          })
-          this.getList()
-        } else {
-          this.$message({
-            type: 'error',
-            message: '添加失败'
-          })
-        }
-      })
+      let res = await noticeUpdate(this.noticeData)
+      if(!res.errno) {
+        this.$message({
+          type: 'success',
+          message: '添加成功!'
+        })
+        this.getList()
+      }else {
+        this.$message({
+          type: 'error',
+          message: '添加失败'
+        })
+      }
       this.dialog = false
     },
-    goNotice() {
-      console.log(this.noticeData)
+    async goNotice() {
       if (!this.noticeData.content) {
         this.$message({
           type: 'error',
@@ -113,20 +111,19 @@ export default {
         })
         return false
       }
-      this.axios.post('notice/add', this.noticeData).then(response => {
-        if (response.data.errno === 0) {
-          this.$message({
-            type: 'success',
-            message: '添加成功!'
-          })
-          this.getList()
-        } else {
-          this.$message({
-            type: 'error',
-            message: '添加失败'
-          })
-        }
-      })
+      let res = await noticeAdd(this.noticeData)
+      if(!res.errno) {
+        this.$message({
+          type: 'success',
+          message: '添加成功!'
+        })
+        this.getList()
+      } else {
+        this.$message({
+          type: 'error',
+          message: '添加失败'
+        })
+      }
       this.dialog = false
     },
     addNotice() {
@@ -140,34 +137,38 @@ export default {
       this.dialog = true
       this.is_add = false
     },
-    submitContent(index, row) {
-      this.axios.post('notice/updateContent', { id: row.id, content: row.content }).then(response => {
-        console.log(response)
+    async submitContent(index, row) {
+      let res = await updateContent({
+        id: row.id,
+        content: row.content
       })
+      if(!res.errno) {
+        console.log(res)
+      }
     },
     handleRowDelete(index, row) {
       this.$confirm('确定要删除?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.axios.post('notice/destory', { id: row.id }).then(response => {
-          console.log(response.data)
-          if (response.data.errno === 0) {
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
-
-            this.getList()
-          }
+      }).then(async () => {
+        let res = await noticeDestory({
+          id: row.id
         })
+        if(!res.errno) {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          this.getList()
+        }
       })
     },
-    getList() {
-      this.axios.get('notice').then(response => {
-        this.tableData = response.data.data
-      })
+    async getList() {
+      let res = await getNotice()
+      if(!res.errno) {
+        this.tableData = res.data
+      }
     }
   }
 }

@@ -32,7 +32,7 @@
   </div>
 </template>
 <script>
-import api from '@/config/api'
+import { updatePrice, goodsSaleStatus, onsale, drop } from '@/api/wap/wap'
 
 export default {
   components: {},
@@ -52,31 +52,28 @@ export default {
   },
   mounted() {
     this.getOnSaleList()
-    this.root = api.rootUrl
   },
   methods: {
-    submit(index, row) {
-      this.axios
-        .post('wap/updatePrice', {
-          id: row.goods_id,
-          sn: row.goods_sn,
-          price: row.retail_price
-        })
-        .then(response => {
-          console.log(response)
-        })
+    async submit(index, row) {
+      let res = await updatePrice({
+        id: row.goods_id,
+        sn: row.goods_sn,
+        price: row.retail_price
+      })
+      if(!res.errno) {
+        console.log(res)
+      }
     },
-    changeStatus($event, para) {
-      this.axios
-        .get('goods/saleStatus', {
-          params: {
-            status: $event,
-            id: para
-          }
-        })
-        .then(() => {
-          this.getList()
-        })
+    async changeStatus($event, para) {
+      let res = await goodsSaleStatus({
+        params: {
+          status: $event,
+          id: para
+        }
+      })
+      if(!res.errno) {
+        this.getList()
+      }
     },
     logout() {
       this.$confirm('是否要退出?', '提示', {
@@ -100,17 +97,17 @@ export default {
         this.pIndex = 1
       }
     },
-    getOnSaleList() {
-      this.axios.get('wap/onsale').then(response => {
-        console.log(response.data)
-        this.tableData = response.data.data
-      })
+    async getOnSaleList() {
+      let res = await onsale()
+      if(!res.errno) {
+        this.tableData = res.data
+      }
     },
-    getOutSaleList() {
-      this.axios.get('wap/drop').then(response => {
-        console.log(response.data)
-        this.tableData = response.data.data
-      })
+    async getOutSaleList() {
+      let res = await drop()
+      if(!res.errno) {
+        this.tableData = res.data
+      }
     }
   }
 }

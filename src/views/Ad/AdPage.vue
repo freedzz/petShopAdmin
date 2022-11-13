@@ -54,6 +54,7 @@
 </template>
 
 <script>
+import { updateSort, saleStatus, adDestoory, getList } from '@/api/ad/ad'
 export default {
   components: {},
   data() {
@@ -73,17 +74,23 @@ export default {
     test() {
       console.log(this.tableData)
     },
-    submitSort(index, row) {
-      this.axios.post('ad/updateSort', { id: row.id, sort: row.sort_order })
+    async submitSort(index, row) {
+      let res = await updateSort({
+        id: row.id,
+        sort: row.sort_order
+      })
+      if(res) {
+        console.log(res)
+      }
     },
-    changeStatus($event, para) {
-      this.axios
-        .get('ad/saleStatus', {
-          params: {
-            status: $event,
-            id: para
-          }
-        })
+    async changeStatus($event, para) {
+      let res = await saleStatus({
+        status: $event,
+        id: para
+      })
+      if(res) {
+        console.log(res)
+      }
     },
     handlePageChange(val) {
       this.page = val
@@ -100,37 +107,32 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.axios.post('ad/destory', { id: row.id }).then(response => {
-          console.log(response.data)
-          if (response.data.errno === 0) {
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
-
-            this.getList()
-          }
+      }).then(async () => {
+        let res = await adDestoory({
+          id: row.id
         })
+        if(!res.errno) {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          this.getList()
+        }
       })
     },
     onSubmitFilter() {
       this.page = 1
       this.getList()
     },
-    getList() {
-      this.axios
-        .get('ad', {
-          params: {
-            page: this.page
-          }
-        })
-        .then(response => {
-          this.tableData = response.data.data.data
-          this.page = response.data.data.currentPage
-          this.total = response.data.data.count
-        })
-      console.log(this.tableData)
+    async getList() {
+      let res = await getList({
+        page: this.page
+      })
+      if(!res.errno) {
+        this.tableData = res.data.data
+        this.page = res.data.currentPage
+        this.total = res.data.count
+      }
     }
   }
 }

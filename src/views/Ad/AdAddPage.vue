@@ -86,6 +86,7 @@
 </template>
 
 <script>
+import { getAdInfo, getallrelate, getQiniuToken, adStore } from '@/api/ad/ad'
 import api from '@/config/api'
 import lrz from 'lrz'
 import moment from 'moment'
@@ -94,7 +95,6 @@ export default {
   data() {
     return {
       qiniuZone: '',
-      root: '',
       fileList: [],
       infoForm: {
         id: 0,
@@ -121,7 +121,6 @@ export default {
   mounted() {
     this.infoForm.id = this.$route.query.id || 0
     this.getInfo()
-    this.root = api.rootUrl
     this.getQiniuToken()
     this.qiniuZone = api.qiniu
   },
@@ -177,12 +176,13 @@ export default {
       this.infoForm.goods_id = id
       this.related_pop = false
     },
-    relateGoodsClick() {
-      this.axios.post('ad/getallrelate', { id: this.infoForm.id }).then(response => {
-        if (response.data.errno === 0) {
-          this.chooseRelateGoods = response.data.data
-        }
+    async relateGoodsClick() {
+      let res = await getallrelate({
+        id: this.infoForm.id
       })
+      if(!res.errno) {
+        this.chooseRelateGoods = res.data
+      }
     },
     test() {
       console.log(this.infoForm.end_time)
@@ -193,14 +193,12 @@ export default {
     adRemove() {
       this.infoForm.image_url = ''
     },
-    getQiniuToken() {
-      const that = this
-      this.axios.post('index/getQiniuToken').then(response => {
-        const resInfo = response.data.data
-        console.log(resInfo)
-        that.picData.token = resInfo.token
-        that.url = resInfo.url
-      })
+    async getQiniuToken() {
+      let res = await getQiniuToken()
+      if(!res.errno) {
+        this.picData.token = res.data.token
+        this.url = res.data.url
+      }
     },
     goBackPage() {
       this.$router.go(-1)
@@ -234,56 +232,49 @@ export default {
           return false
         }
       }
-      this.$refs.infoForm.validate(valid => {
+      this.$refs.infoForm.validate(async (valid) => {
         if (valid) {
-          this.axios.post('ad/store', this.infoForm).then(response => {
-            if (response.data.errno === 0) {
-              this.$message({
-                type: 'success',
-                message: '保存成功'
-              })
-              this.$router.go(-1)
-            } else if (response.data.errno === 100) {
-              this.$message({
-                type: 'error',
-                message: '该商品已经有广告关联'
-              })
-            } else {
-              this.$message({
-                type: 'error',
-                message: '保存失败'
-              })
-            }
-          })
+          let res = await adStore(this.infoForm)
+          if(!res.errno) {
+            this.$message({
+              type: 'success',
+              message: '保存成功'
+            })
+            this.$router.go(-1)
+          } else if(res.errno === 100) {
+            this.$message({
+              type: 'error',
+              message: '该商品已经有广告关联'
+            })
+          } else {
+            this.$message({
+              type: 'error',
+              message: '保存失败'
+            })
+          }
         } else {
           return false
         }
       })
     },
-    getInfo() {
+    async getInfo() {
       if (this.infoForm.id <= 0) {
         return false
       }
-      // 加载广告详情
-      const that = this
-      this.axios
-        .get('ad/info', {
-          params: {
-            id: that.infoForm.id
-          }
-        })
-        .then(response => {
-          const resInfo = response.data.data
-          resInfo.enabled = resInfo.enabled ? '1' : '0'
-          that.infoForm = resInfo
-          that.infoForm.end_time = resInfo.end_time * 1000
-          const info = {
-            name: resInfo.name,
-            url: resInfo.image_url
-          }
-          this.fileList.push(info)
-          console.log(this.infoForm)
-        })
+      let res = await getAdInfo({
+        id: this.infoForm.id
+      })
+      if(!res.errno) {
+        const resInfo = res.data
+        resInfo.enabled = resInfo.enabled ? '1' : '0'
+        this.infoForm = resInfo
+        this.infoForm.end_time = resInfo.end_time * 1000
+        const info = {
+          name: resInfo.name,
+          url: resInfo.image_url
+        }
+        this.fileList.push(info)
+      }
     }
   }
 }

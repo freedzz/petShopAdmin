@@ -1,4 +1,7 @@
 import request from '../request.js'
+/**
+ * order
+ */
 export function getAllRegion () {
   return request({
     method: 'get',
@@ -142,6 +145,51 @@ export function getOrderDetail (data) {
   return request({
     method: 'get',
     url: '/order/detail',
+    data
+  })
+}
+/**
+ * orderDetail
+ */
+export function orderChangeStatus (data) {
+  return request({
+    method: 'post',
+    url: '/order/changeStatus',
+    data
+  })
+}
+export function getOrderExpress (data) {
+  return request({
+    method: 'post',
+    url: '/order/getOrderExpress',
+    data
+  })
+}
+export function orderpack (data) {
+  return request({
+    method: 'get',
+    url: '/order/orderpack',
+    data
+  })
+}
+export function goodsListDelete (data) {
+  return request({
+    method: 'post',
+    url: '/order/goodsListDelete',
+    data
+  })
+}
+export function saveGoodsList (data) {
+  return request({
+    method: 'post',
+    url: '/order/saveGoodsList',
+    data
+  })
+}
+export function saveAddress (data) {
+  return request({
+    method: 'post',
+    url: '/order/saveAddress',
     data
   })
 }

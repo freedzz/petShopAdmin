@@ -29,7 +29,7 @@
 </template>
 
 <script>
-// import api from '@/config/api'
+import { adminDetail, adminAdd, adminSave } from '@/api/admin/admin'
 
 export default {
   components: {},
@@ -76,31 +76,28 @@ export default {
           return false
         }
       }
-      this.$refs['infoForm'].validate(valid => {
+      this.$refs['infoForm'].validate(async (valid) => {
         if (valid) {
-          this.axios
-            .post('admin/adminSave', {
-              user: user,
-              change: this.change
+          let res = await adminSave({
+            user: user,
+            change: this.change
+          })
+          if (res.errno === 0) {
+            this.$message({
+              type: 'success',
+              message: '保存成功'
             })
-            .then(response => {
-              if (response.data.errno === 0) {
-                this.$message({
-                  type: 'success',
-                  message: '保存成功'
-                })
-              } else if (response.data.errno === 400) {
-                this.$message({
-                  type: 'error',
-                  message: response.data.errmsg
-                })
-              } else {
-                this.$message({
-                  type: 'error',
-                  message: '保存失败'
-                })
-              }
+          } else if (res.errno === 400) {
+            this.$message({
+              type: 'error',
+              message: res.errmsg
             })
+          } else {
+            this.$message({
+              type: 'error',
+              message: '保存失败'
+            })
+          }
         } else {
           return false
         }
@@ -119,44 +116,36 @@ export default {
         })
         return false
       }
-      this.$refs['infoForm'].validate(valid => {
+      this.$refs['infoForm'].validate(async (valid) => {
         if (valid) {
-          this.axios
-            .post('admin/adminAdd', {
-              user: user
+          let res = await adminAdd({
+            user: user
+          })
+          if (res.errno === 0) {
+            this.$message({
+              type: 'success',
+              message: '添加成功'
             })
-            .then(response => {
-              if (response.data.errno === 0) {
-                this.$message({
-                  type: 'success',
-                  message: '添加成功'
-                })
-                this.$router.push({ name: 'admin' })
-              } else {
-                this.$message({
-                  type: 'error',
-                  message: '添加失败'
-                })
-              }
+            this.$router.push({ name: 'admin' })
+          } else {
+            this.$message({
+              type: 'error',
+              message: '添加失败'
             })
+          }
         } else {
           return false
         }
       })
     },
-    getInfo() {
+    async getInfo() {
       //加载品牌详情
-      let that = this
-      this.axios
-        .post('admin/adminDetail', {
-          id: that.infoForm.id
-        })
-        .then(response => {
-          if (response.data.errno === 0) {
-            let resInfo = response.data.data
-            that.infoForm = resInfo
-          }
-        })
+      let res = await adminDetail({
+        id: this.infoForm.id
+      })
+      if(!res.errno) {
+        this.infoForm = res.data
+      }
     }
   }
 }

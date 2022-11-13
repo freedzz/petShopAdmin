@@ -177,7 +177,7 @@
 </template>
 
 <script>
-// import api from '@/config/api'
+import { getAllRegion, getUserFoot, getUserCartdata, getUserAddress, userSaveAddress, updateInfo, updateName, updateMobile, getDataInfo, getUserInfo, getUserOrder } from '@/api/user/user'
 export default {
   components: {},
   data() {
@@ -223,24 +223,23 @@ export default {
     }
   },
   methods: {
-    saveAddress() {
+    async saveAddress() {
       this.nowAddressData.addOptions = this.addOptions
-      this.axios.post('user/saveaddress', this.nowAddressData).then(response => {
-        if (response.data.errno === 0) {
-          this.$message({
-            type: 'success',
-            message: '修改成功!'
-          })
-          this.addressData = []
-          this.getAddress()
-          this.dialogAddressVisible = false
-        } else {
-          this.$message({
-            type: 'error',
-            message: '修改失败'
-          })
-        }
-      })
+      let res = await userSaveAddress(this.nowAddressData)
+      if (!res.errno) {
+        this.$message({
+          type: 'success',
+          message: '修改成功!'
+        })
+        this.addressData = []
+        this.getAddress()
+        this.dialogAddressVisible = false
+      } else {
+        this.$message({
+          type: 'error',
+          message: '修改失败'
+        })
+      }
     },
     addressEdit(item) {
       this.nowAddressData = item
@@ -269,40 +268,48 @@ export default {
         this.getFootData()
       }
     },
-    submitNick(index, row) {
-      this.axios.post('user/updateInfo', { id: row.id, nickname: row.nickname }).then(response => {
-        console.log(response)
+    async submitNick(index, row) {
+      let res = await updateInfo({
+        id: row.id,
+        nickname: row.nickname
       })
+      if (!res.errno) {
+        console.log(res)
+      }
     },
-    submitName(index, row) {
-      this.axios.post('user/updateName', { id: row.id, name: row.name }).then(response => {
-        if (response.data.errno === 0) {
-          this.$message({
-            type: 'success',
-            message: '修改成功!'
-          })
-        } else {
-          this.$message({
-            type: 'error',
-            message: '修改失败'
-          })
-        }
+    async submitName(index, row) {
+      let res = await updateName({
+        id: row.id,
+        name: row.name
       })
+      if (!res.errno) {
+        this.$message({
+          type: 'success',
+          message: '修改成功!'
+        })
+      } else {
+        this.$message({
+          type: 'error',
+          message: '修改失败'
+        })
+      }
     },
-    submitMobile(index, row) {
-      this.axios.post('user/updateMobile', { id: row.id, mobile: row.mobile }).then(response => {
-        if (response.data.errno === 0) {
-          this.$message({
-            type: 'success',
-            message: '修改成功!'
-          })
-        } else {
-          this.$message({
-            type: 'error',
-            message: '修改失败'
-          })
-        }
+    async submitMobile(index, row) {
+      let res = await updateMobile({
+        id: row.id,
+        mobile: row.mobile
       })
+      if (!res.errno) {
+        this.$message({
+          type: 'success',
+          message: '修改成功!'
+        })
+      } else {
+        this.$message({
+          type: 'error',
+          message: '修改失败'
+        })
+      }
     },
     handlePageChange(val) {
       this.page = val
@@ -322,114 +329,89 @@ export default {
     goBackPage() {
       this.$router.go(-1)
     },
-    datainfo() {
+    async datainfo() {
       if (this.infoForm.id <= 0) {
         return false
       }
-      const that = this
-      this.axios
-        .get('user/datainfo', {
-          params: {
-            id: that.infoForm.id
-          }
-        })
-        .then(response => {
-          const info = response.data.data
-          this.dataInfo = info
-        })
-    },
-    getInfo() {
-      if (this.infoForm.id <= 0) {
-        return false
-      }
-      const that = this
-      this.axios
-        .get('user/info', {
-          params: {
-            id: that.infoForm.id
-          }
-        })
-        .then(response => {
-          const info = response.data.data
-          this.userData.push(info)
-        })
-    },
-    getOrder() {
-      if (this.infoForm.id <= 0) {
-        return false
-      }
-      const that = this
-      this.axios
-        .get('user/order', {
-          params: {
-            id: that.infoForm.id,
-            page: this.page
-          }
-        })
-        .then(response => {
-          this.orderData = response.data.data.data
-          this.page = response.data.data.currentPage
-          this.total = response.data.data.count
-        })
-    },
-    getAddress() {
-      if (this.infoForm.id <= 0) {
-        return false
-      }
-      const that = this
-      this.axios
-        .get('user/address', {
-          params: {
-            id: that.infoForm.id,
-            page: this.page
-          }
-        })
-        .then(response => {
-          this.addressData = response.data.data.data
-          this.page = response.data.data.currentPage
-          this.total = response.data.data.count
-        })
-    },
-    getCartData() {
-      if (this.infoForm.id <= 0) {
-        return false
-      }
-      const that = this
-      this.axios
-        .get('user/cartdata', {
-          params: {
-            id: that.infoForm.id,
-            page: this.page
-          }
-        })
-        .then(response => {
-          this.cartData = response.data.data.data
-          this.page = response.data.data.currentPage
-          this.total = response.data.data.count
-        })
-    },
-    getFootData() {
-      if (this.infoForm.id <= 0) {
-        return false
-      }
-      const that = this
-      this.axios
-        .get('user/foot', {
-          params: {
-            id: that.infoForm.id,
-            page: this.page
-          }
-        })
-        .then(response => {
-          this.footData = response.data.data.data
-          this.page = response.data.data.currentPage
-          this.total = response.data.data.count
-        })
-    },
-    getAllRegion() {
-      this.axios.get('order/getAllRegion').then(response => {
-        this.options = response.data.data
+      let res = await getDataInfo({
+        id: this.infoForm.id
       })
+      if (!res.errno) {
+        this.dataInfo = res.data
+      }
+    },
+    async getInfo() {
+      if (this.infoForm.id <= 0) {
+        return false
+      }
+      let res = await getUserInfo({
+        id: this.infoForm.id
+      })
+      if (!res.errno) {
+        this.userData.push(res.data)
+      }
+    },
+    async getOrder() {
+      if (this.infoForm.id <= 0) {
+        return false
+      }
+      let res = await getUserOrder({
+        id: this.infoForm.id,
+        page: this.page
+      })
+      if (!res.errno) {
+        this.orderData = res.data.data
+        this.page = res.data.currentPage
+        this.total = res.data.count
+      }
+    },
+    async getAddress() {
+      if (this.infoForm.id <= 0) {
+        return false
+      }
+      let res = await getUserAddress({
+        id: this.infoForm.id,
+        page: this.page
+      })
+      if (!res.errno) {
+        this.addressData = res.data.data
+        this.page = res.data.currentPage
+        this.total = res.data.count
+      }
+    },
+    async getCartData() {
+      if (this.infoForm.id <= 0) {
+        return false
+      }
+      let res = await getUserCartdata({
+        id: this.infoForm.id,
+        page: this.page
+      })
+      if (!res.errno) {
+        this.cartData = res.data.data
+        this.page = res.data.currentPage
+        this.total = res.data.count
+      }
+    },
+    async getFootData() {
+      if (this.infoForm.id <= 0) {
+        return false
+      }
+      let res = await getUserFoot({
+        id: this.infoForm.id,
+        page: this.page
+      })
+      if (!res.errno) {
+        this.footData = res.data.data
+        this.page = res.data.currentPage
+        this.total = res.data.count
+      }
+    },
+    async getAllRegion() {
+      let res = await getAllRegion()
+      if (!res.errno) {
+        this.options = res.data
+      }
     }
   }
 }

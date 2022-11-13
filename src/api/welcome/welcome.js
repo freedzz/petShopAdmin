@@ -12,3 +12,9 @@ export function getMainInfo (data) {
     data
   })
 }
+export function getIndexInfo () {
+  return request({
+    method: 'get',
+    url: '/index'
+  })
+}

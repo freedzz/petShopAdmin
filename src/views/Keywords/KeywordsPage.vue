@@ -47,6 +47,7 @@
 </template>
 
 <script>
+import { keywordsDestory, getKeywords } from '@/api/keywords/keywords'
 export default {
   components: {},
   data() {
@@ -78,37 +79,35 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.axios.post('keywords/destory', { id: row.id }).then(response => {
-          console.log(response.data)
-          if (response.data.errno === 0) {
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
-
-            this.getList()
-          }
+      }).then(async () => {
+        let res = await keywordsDestory({
+          id: row.id
         })
+        if (res.errno === 0) {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          this.getList()
+        }
       })
     },
     onSubmitFilter() {
       this.page = 1
       this.getList()
     },
-    getList() {
-      this.axios
-        .get('keywords', {
-          params: {
-            page: this.page,
-            name: this.filterForm.name
-          }
-        })
-        .then(response => {
-          this.tableData = response.data.data.data
-          this.page = response.data.data.currentPage
-          this.total = response.data.data.count
-        })
+    async getList() {
+      let res = await getKeywords({
+        params: {
+          page: this.page,
+          name: this.filterForm.name
+        }
+      })
+      if(!res.errno) {
+        this.tableData = res.data.data
+        this.page = res.data.currentPage
+        this.total = res.data.count
+      }
     }
   }
 }
