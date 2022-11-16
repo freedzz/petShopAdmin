@@ -215,7 +215,7 @@ import moment from 'moment'
 import draggable from 'vuedraggable'
 import $ from 'jquery'
 import { quillEditor } from 'vue-quill-editor'
-import { checkSku, goodsStore, uploadHttpsImage, getGoodsSpec, getQiniuToken, getGalleryList, copygoods, goodsInfo, getAllCategory, getAllSpecification, getExpressData } from '@/api/goods/goods'
+import { uploadToQiniu, checkSku, goodsStore, uploadHttpsImage, getGoodsSpec, getQiniuToken, getGalleryList, copygoods, goodsInfo, getAllCategory, getAllSpecification, getExpressData } from '@/api/goods/goods'
 const toolbarOptions = [
   ['bold', 'italic', 'underline', 'strike'],
   ['blockquote'],
@@ -381,28 +381,23 @@ export default {
     uploadIndexImg(request) {
       const file = request.file
       lrz(file)
-        .then(rst => {
-          const config = {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          }
+        .then(async (rst) => {
           const fileName = moment().format('YYYYMMDDHHmmssSSS') + Math.floor(Math.random() * 100) + file.name // 自定义图片名
           const formData = new FormData()
           formData.append('file', rst.file)
           formData.append('token', this.picData.token)
           formData.append('key', fileName)
-          this.$http.post(this.qiniuZone, formData, config).then(res => {
-            this.handleUploadListSuccess(res.data)
-          })
+          let res = await uploadToQiniu(this.qiniuZone, formData)
+          if(res) {
+            this.handleUploadListSuccess(res)
+          }
         })
         .catch(function(err) {
           console.log(err)
         })
     },
     async handleUploadListSuccess(res) {
-      const url = this.url
-      this.infoForm.list_pic_url = url + res.key
+      this.infoForm.list_pic_url = this.url + res.key
       let res2 = await uploadHttpsImage({
         url: this.infoForm.list_pic_url
       })
@@ -426,28 +421,23 @@ export default {
     uploadGalleryImg(request) {
       const file = request.file
       lrz(file)
-        .then(rst => {
-          const config = {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          }
+        .then(async (rst) => {
           const fileName = moment().format('YYYYMMDDHHmmssSSS') + Math.floor(Math.random() * 100) + file.name // 自定义图片名
           const formData = new FormData()
           formData.append('file', rst.file)
           formData.append('token', this.picData.token)
           formData.append('key', fileName)
-          this.$http.post(this.qiniuZone, formData, config).then(res => {
-            this.handleUploadGallerySuccess(res.data)
-          })
+          let res = await uploadToQiniu(this.qiniuZone, formData)
+          if(res) {
+            this.handleUploadGallerySuccess(res)
+          }
         })
         .catch(function(err) {
           console.log(err)
         })
     },
     handleUploadGallerySuccess(res) {
-      const url = this.url
-      const urlData = url + res.key
+      const urlData = this.url + res.key
       const data = {
         id: 0,
         url: urlData,
@@ -483,7 +473,7 @@ export default {
       let res = await checkSku({
         info: row
       })
-      if(!res.errno) {
+      if(res.errno === 100) {
         this.$message({
           type: 'error',
           message: '该SKU已存在！'
@@ -528,9 +518,8 @@ export default {
     async getQiniuToken() {
       let res = await getQiniuToken()
       if(!res.errno) {
-        const resInfo = res.data
-        this.picData.token = resInfo.token
-        this.url = resInfo.url
+        this.picData.token = res.data.token
+        this.url = res.data.url
       }
     },
     specChange(value) {
@@ -714,28 +703,23 @@ export default {
     uploadDetailsImg(request) {
       const file = request.file
       lrz(file)
-        .then(rst => {
-          const config = {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          }
+        .then(async (rst) => {
           const fileName = moment().format('YYYYMMDDHHmmssSSS') + Math.floor(Math.random() * 100) + file.name // 自定义图片名
           const formData = new FormData()
           formData.append('file', rst.file)
           formData.append('token', this.picData.token)
           formData.append('key', fileName)
-          this.$http.post(this.qiniuZone, formData, config).then(res => {
-            this.handleUploadDetailSuccess(res.data)
-          })
+          let res = await uploadToQiniu(this.qiniuZone, formData)
+          if(res) {
+            this.handleUploadDetailSuccess(res)
+          }
         })
         .catch(function(err) {
           console.log(err)
         })
     },
     handleUploadDetailSuccess(res) {
-      const url = this.url
-      const data = url + res.key
+      const data = this.url + res.key
       const quill = this.$refs.myTextEditor.quill
       // 如果上传成功
       // 获取光标所在位置

@@ -79,8 +79,10 @@ export default {
         id: row.id,
         sort: row.sort_order
       })
-      if(res) {
-        console.log(res)
+      if(!res.errno) {
+        this.$message.success('修改成功')
+      } else {
+        this.$message.success('修改失败')
       }
     },
     async changeStatus($event, para) {

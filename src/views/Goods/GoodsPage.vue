@@ -377,6 +377,7 @@ export default {
         this.tableData = res.data.data
         this.page = res.data.currentPage
         this.total = res.data.count
+        this.filterForm.name = ''
       }
     },
     async getList() {

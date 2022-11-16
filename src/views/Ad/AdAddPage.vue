@@ -87,6 +87,7 @@
 
 <script>
 import { getAdInfo, getallrelate, getQiniuToken, adStore } from '@/api/ad/ad'
+import { uploadToQiniu } from '@/api/goods/goods'
 import api from '@/config/api'
 import lrz from 'lrz'
 import moment from 'moment'
@@ -148,20 +149,16 @@ export default {
     uploadIndexImg(request) {
       const file = request.file
       lrz(file)
-        .then(rst => {
-          const config = {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          }
+        .then(async (rst) => {
           const fileName = moment().format('YYYYMMDDHHmmssSSS') + Math.floor(Math.random() * 100) + file.name // 自定义图片名
           const formData = new FormData()
           formData.append('file', rst.file)
           formData.append('token', this.picData.token)
           formData.append('key', fileName)
-          this.$http.post(this.qiniuZone, formData, config).then(res => {
-            this.handleUploadImageSuccess(res.data)
-          })
+          let res = await uploadToQiniu(this.qiniuZone, formData)
+          if(res) {
+            this.handleUploadImageSuccess(res)
+          }
         })
         .catch(function(err) {
           console.log(err)

@@ -37,7 +37,7 @@ export function getallrelate (data) {
 export function getQiniuToken (data) {
   return request({
     method: 'post',
-    url: '/ad/getQiniuToken',
+    url: '/index/getQiniuToken',
     data
   })
 }

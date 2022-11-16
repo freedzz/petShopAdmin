@@ -2,21 +2,17 @@
   <div class="content-page">
     <div class="content-nav">
       <el-breadcrumb class="breadcrumb" separator="/">
-        <!--<el-breadcrumb-item :to="{ name: 'dashboard' }">首页</el-breadcrumb-item>-->
         <el-breadcrumb-item :to="{ name: 'order' }">订单管理</el-breadcrumb-item>
         <el-breadcrumb-item>{{ infoForm.order_sn ? '订单详情' : '添加订单' }}</el-breadcrumb-item>
       </el-breadcrumb>
       <div class="operation-nav">
         <el-button type="primary" size="small" icon="arrow-left" @click="goBackPage">返回列表</el-button>
-        <!--<el-button type="primary" @click="test" size="small" icon="arrow-left">test</el-button>-->
       </div>
     </div>
     <div class="order-status-text">
       <label>{{ infoForm.order_status_text }}</label>
       <div>
         <el-button type="danger" plain @click="changeStatus">变更状态</el-button>
-        <!--<el-button v-if="infoForm.order_status == 201" type="danger" @click="goPackage">备货</el-button>-->
-        <!--<el-button v-if="infoForm.order_status == 300" type="primary" @click="goPackage">发货</el-button>-->
       </div>
     </div>
     <div class="content-main">
@@ -299,7 +295,7 @@ export default {
     changeStatus() {
       this.statusVisible = true
     },
-    async tatusConfirm() {
+    async statusConfirm() {
       let res = await orderChangeStatus({
         status: this.statusValue,
         orderSn: this.infoForm.order_sn

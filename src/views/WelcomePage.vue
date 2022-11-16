@@ -120,28 +120,28 @@
           <el-card class="box-card">
             <div class="text item">
               <span>客单价</span>
-              <p style="float: right;">{{ (mainInfo.payOrderSum / mainInfo.payOrderNum) | numFilter }}</p>
+              <p style="float: right;">{{ (mainInfo.payOrderNum ? mainInfo.payOrderSum / mainInfo.payOrderNum : 0) | numFilter }}</p>
             </div>
             <p class="tips">成交金额/成交订单数</p>
           </el-card>
           <el-card class="box-card">
             <div class="text item">
               <span>下单转化率</span>
-              <p style="float: right;">{{ (mainInfo.addOrderNum / (mainInfo.newUser + mainInfo.oldUser)) | numFilter }}</p>
+              <p style="float: right;">{{ ((mainInfo.newUser + mainInfo.oldUser) ? mainInfo.addOrderNum / (mainInfo.newUser + mainInfo.oldUser) : 0) | numFilter }}</p>
             </div>
             <p class="tips">下单人数/访问人数</p>
           </el-card>
           <el-card class="box-card">
             <div class="text item">
               <span>下单-支付转化率</span>
-              <p style="float: right;">{{ (mainInfo.payOrderNum / mainInfo.addOrderNum) | numFilter }}</p>
+              <p style="float: right;">{{ (mainInfo.addOrderNum ? mainInfo.payOrderNum / mainInfo.addOrderNum : 0) | numFilter }}</p>
             </div>
             <p class="tips">支付人数/下单人数</p>
           </el-card>
           <el-card class="box-card">
             <div class="text item">
               <span>支付转化率</span>
-              <p style="float: right;">{{ (mainInfo.payOrderNum / (mainInfo.newUser + mainInfo.oldUser)) | numFilter }}</p>
+              <p style="float: right;">{{ ((mainInfo.newUser + mainInfo.oldUser) ? mainInfo.payOrderNum / (mainInfo.newUser + mainInfo.oldUser) : 0) | numFilter }}</p>
             </div>
             <p class="tips">支付人数/访问人数</p>
           </el-card>

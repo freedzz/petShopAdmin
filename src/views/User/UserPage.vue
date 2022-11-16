@@ -87,7 +87,9 @@ export default {
         nickname: row.nickname
       })
       if(!res.errno) {
-        console.log(res)
+        this.$message.success('修改成功')
+      } else {
+        this.$message.success('修改失败')
       }
     },
     handlePageChange(val) {

@@ -7,13 +7,14 @@
       </el-breadcrumb>
       <div class="operation-nav">
         <el-button type="primary" icon="arrow-left" @click="goBackPage">返回列表</el-button>
-        <!--<el-button type="primary" @click="test" icon="arrow-left">测试</el-button>-->
       </div>
     </div>
     <div class="content-main">
       <div class="form-table-box">
         <el-form ref="infoForm" :rules="infoRules" :model="infoForm" labelWidth="120px">
-          <el-form-item label="模板名字" prop="name"><el-input v-model="infoForm.name" placeholder="请输入模板名称" autofocus></el-input></el-form-item>
+          <el-form-item label="模板名字" prop="name">
+            <el-input v-model="infoForm.name" placeholder="请输入模板名称" autofocus></el-input>
+          </el-form-item>
           <el-form-item label="包装费用"><el-input v-model="infoForm.package_price"></el-input></el-form-item>
           <el-form-item label="快递收费方式">
             <el-radio-group v-model="infoForm.freight_type">
@@ -21,25 +22,7 @@
               <el-radio :label="1">按重量计费</el-radio>
             </el-radio-group>
           </el-form-item>
-
           <el-form-item label="默认运费" class="default-freight">
-            <!--<div class="line-wrap">-->
-            <!--<div class="line">-->
-            <!--<el-input v-model="defaultData.start"></el-input>-->
-            <!--<div class="text">{{infoForm.freight_type == 0?'件内':'KG内'}}</div>-->
-            <!--<el-input v-model="defaultData.start_fee"></el-input>-->
-            <!--<div class="text">元</div>-->
-            <!--</div>-->
-            <!--<div class="line2">-->
-            <!--<div class="text2">每增加</div>-->
-            <!--<el-input v-model="defaultData.add"></el-input>-->
-            <!--<div class="text">{{infoForm.freight_type == 0?'件':'KG'}}</div>-->
-            <!--<div class="text2">增加</div>-->
-            <!--<el-input v-model="defaultData.add_fee"></el-input>-->
-            <!--<div class="text">元</div>-->
-            <!--</div>-->
-            <!--</div>-->
-
             <div class="form-table-box">
               <el-table :data="defaultData" style="width: 100%" border stripe>
                 <el-table-column prop="start" :label="infoForm.freight_type == 0 ? '首件(个)' : '首重(KG)'">
@@ -356,7 +339,6 @@ export default {
         })
         return false
       }
-
       for (const ele of defa) {
         if (ele.start === 0 || ele.add === 0 || ele.start_fee < 0 || ele.add_fee < 0) {
           this.$message({
@@ -418,19 +400,11 @@ export default {
         })
         return false
       }
-
       for (const ele of defa) {
         if (ele.start === 0 || ele.add === 0 || ele.start_fee < 0 || ele.add_fee < 0) {
           this.$message({
             type: 'error',
             message: '值不能为空'
-          })
-          return false
-        }
-        if (!ele.area) {
-          this.$message({
-            type: 'error',
-            message: '地区不能为空'
           })
           return false
         }

@@ -628,7 +628,7 @@ export default {
         orderId: this.order_id,
         shipper: this.nowDeliveryId,
         method: this.dform.method,
-        logistic_code: this.dform.logistic_code
+        logisticCode: this.dform.logistic_code
       })
       if (res.errno === 0) {
         this.dialogFormVisible = false
@@ -804,7 +804,7 @@ export default {
         page: this.page,
         orderSn: this.filterForm.order_sn,
         consignee: this.filterForm.consignee,
-        logistic_code: this.filterForm.logistic_code,
+        logisticCode: this.filterForm.logistic_code,
         status: this.order_status
       })
       if (res.errno === 0) {
@@ -967,6 +967,7 @@ export default {
         order_id: this.order_id
       })
       if (!res.errno) {
+        debugger
         this.getList()
         this.printMiandan = false
         this.dialogFormVisible = false

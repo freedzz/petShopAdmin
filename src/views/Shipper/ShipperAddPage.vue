@@ -100,9 +100,7 @@ export default {
       }
       //加载快递公司详情
       let res = await getShipperInfp({
-        params: {
-          id: this.infoForm.id
-        }
+        id: this.infoForm.id
       })
       if(!res.errno) {
         this.infoForm = res.data

@@ -87,7 +87,9 @@ export default {
         sort: row.sort_order
       })
       if(!res.errno) {
-        console.log(res)
+        this.$message.success('修改成功')
+      } else {
+        this.$message.error('修改失败')
       }
     },
     goBackPage() {
@@ -130,10 +132,8 @@ export default {
     },
     async getList() {
       let res = await shipperList({
-        params: {
-          page: this.page,
-          name: this.filterForm.name
-        }
+        page: this.page,
+        name: this.filterForm.name
       })
       if(!res.errno) {
         this.tableData = res.data.data
@@ -146,10 +146,8 @@ export default {
     },
     async changeStatus($event, para) {
       let res = await enabledStatus({
-        params: {
-          status: $event,
-          id: para
-        }
+        status: $event,
+        id: para
       })
       if(!res.errno) {
         this.$message({

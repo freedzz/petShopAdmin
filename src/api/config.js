@@ -1,8 +1,11 @@
 import axios from 'axios'
+import apiConfig from '@/config/api'
 // 添加请求拦截器
 axios.interceptors.request.use(function (config) {
   // 在发送请求之前做些什么
-  config.headers['Content-Type'] = 'application/json; charset=utf-8'
+  config.baseURL = !config.realUrl ? apiConfig.rootUrl : ''
+  config.headers.common['X-Hioshop-Token'] = localStorage.getItem('token') || ''
+  config.headers['Content-Type'] = config.headers['Content-Type'] || 'application/json; charset=utf-8'
   return config
 }, (error) => {
   // 对请求错误做些什么

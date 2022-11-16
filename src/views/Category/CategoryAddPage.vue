@@ -10,12 +10,6 @@
     <div class="content-main">
       <div class="form-table-box">
         <el-form ref="infoForm" :rules="infoRules" :model="infoForm" labelWidth="120px">
-          <!-- <el-form-item label="上级分类" prop="name">
-                        <el-select v-model="infoForm.parent_id" placeholder="请选择上级分类">
-                            <el-option v-for="item in parentCategory" :key="item.id" :label="item.name"
-                                       :value="item.id"></el-option>
-                        </el-select>
-                    </el-form-item> -->
           <el-form-item label="分类名称" prop="name"><el-input v-model="infoForm.name"></el-input></el-form-item>
           <el-form-item label="简短介绍">
             <el-input v-model="infoForm.front_name" type="textarea" :rows="1"></el-input>
@@ -38,7 +32,7 @@
             </el-upload>
             <div class="form-tip">图片尺寸：顶级分类为690*自定义, 只能上传jpg/png文件</div>
           </el-form-item>
-          <el-form-item v-if="infoForm.parent_id == 0" label="分类图片高度" prop="name"><el-input v-model="infoForm.p_height"></el-input></el-form-item>
+          <!-- <el-form-item v-if="infoForm.parent_id == 0" label="分类图片高度" prop="name"><el-input v-model="infoForm.p_height"></el-input></el-form-item> -->
           <el-form-item v-if="infoForm.parent_id == 0" label="图标" prop="icon_url">
             <img v-if="infoForm.icon_url" :src="infoForm.icon_url" class="image-show">
             <el-upload

@@ -112,20 +112,34 @@ export function uploadHttpsImage (data) {
 export function getGoodsSpec (data) {
   return request({
     method: 'post',
-    url: '/goods/getGoodsSpec',
+    url: '/specification/getGoodsSpec',
     data
   })
 }
 export function getQiniuToken () {
   return request({
     method: 'post',
-    url: '/goods/getQiniuToken'
+    url: '/index/getQiniuToken'
+  })
+}
+export function uploadToQiniu(url, data) {
+  return request({
+    method: 'post',
+    isCustom: false,
+    url: url,
+    data,
+    config: {
+      realUrl: true,
+    },
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
   })
 }
 export function getGalleryList (data) {
   return request({
     method: 'post',
-    url: '/goods/galleryList',
+    url: '/goods/getGalleryList',
     data
   })
 }
