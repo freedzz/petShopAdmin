@@ -185,3 +185,9 @@ export function getExpressData (data) {
     data
   })
 }
+export function getUniversalEnum () {
+  return request({
+    method: 'get',
+    url: '/universalEnum/getUniversalEnum'
+  })
+}

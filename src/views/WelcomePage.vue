@@ -4,7 +4,7 @@
       <el-breadcrumb class="breadcrumb" separator="/"><el-breadcrumb-item>后台主页</el-breadcrumb-item></el-breadcrumb>
     </div>
     <div class="content-main clearfix">
-      <div class="notice">
+      <!-- <div class="notice">
         <div class="l">本演示后台数据为演示数据，可以随意操作，系统每5分钟重置一次</div>
         <div v-if="resetVision" class="r">
           <label>重置倒计时：</label>
@@ -14,7 +14,7 @@
       <div class="github">
         <a target="_blank" href="https://github.com/iamdarcy">github地址</a>
         <div class="l">请您在github给个star。 技术交流QQ群：824781955</div>
-      </div>
+      </div> -->
       <div class="header clearfix">
         <el-card class="box-card card-red">
           <router-link class="link-color" :to="{ path: '/dashboard/order' }">
@@ -152,11 +152,11 @@
 </template>
 
 <script>
-import Countdown from './Common/Countdown'
+// import Countdown from './Common/Countdown'
 import { getInfo, getMainInfo } from '@/api/welcome/welcome'
 export default {
   components: {
-    Countdown
+    // Countdown
   },
   filters: {
     numFilter (value) {

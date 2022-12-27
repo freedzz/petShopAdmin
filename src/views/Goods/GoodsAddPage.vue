@@ -159,6 +159,49 @@
             </el-select>
           </el-form-item>
           <el-form-item label="排序" prop="sort_order"><el-input-number v-model="infoForm.sort_order" :mini="1" :max="100"></el-input-number></el-form-item>
+          <!-- 商品高级查询 -->
+          <el-form-item label="商品高级查询">
+            <el-select v-model="goodsEnum.weight" style="margin-right: 15px;" clearable placeholder="请选择重量">
+              <el-option
+                v-for="(item, index) in weightList"
+                :key="index"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+            <el-select v-model="goodsEnum.particle_size" style="margin-right: 15px;" clearable placeholder="请选择颗粒大小">
+              <el-option
+                v-for="(item, index) in particleSizeList"
+                :key="index"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+            <el-select v-model="goodsEnum.age_group" style="margin-right: 15px;" clearable placeholder="请选择年龄段">
+              <el-option
+                v-for="(item, index) in ageGroupList"
+                :key="index"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+            <el-select v-model="goodsEnum.canine_type" style="margin-right: 15px;" clearable placeholder="请选择犬型">
+              <el-option
+                v-for="(item, index) in canineTypeList"
+                :key="index"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+            <el-select v-model="goodsEnum.formula" style="margin-right: 15px;" clearable placeholder="请选择配方">
+              <el-option
+                v-for="(item, index) in formulaList"
+                :key="index"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </el-form-item>
           <el-form-item label=" ">
             <el-switch
               v-model="infoForm.is_on_sale"
@@ -215,7 +258,7 @@ import moment from 'moment'
 import draggable from 'vuedraggable'
 import $ from 'jquery'
 import { quillEditor } from 'vue-quill-editor'
-import { uploadToQiniu, checkSku, goodsStore, uploadHttpsImage, getGoodsSpec, getQiniuToken, getGalleryList, copygoods, goodsInfo, getAllCategory, getAllSpecification, getExpressData } from '@/api/goods/goods'
+import { getUniversalEnum, uploadToQiniu, checkSku, goodsStore, uploadHttpsImage, getGoodsSpec, getQiniuToken, getGalleryList, copygoods, goodsInfo, getAllCategory, getAllSpecification, getExpressData } from '@/api/goods/goods'
 const toolbarOptions = [
   ['bold', 'italic', 'underline', 'strike'],
   ['blockquote'],
@@ -296,8 +339,16 @@ export default {
         goods_brief: '',
         goods_desc: '',
         is_on_sale: 0,
-        is_new: false
+        is_new: false,
         // is_index: false,
+      },
+      // 商品高级查询
+      goodsEnum: {
+        particle_size: '', // 颗粒大小
+        age_group: '', // 年龄段
+        canine_type: '', // 犬型
+        formula: '', // 配方
+        weight: ''
       },
       infoRules: {
         name: [
@@ -352,7 +403,13 @@ export default {
       visible: false,
       hasPost: 0,
       previewList: [],
-      autoFocus: false
+      autoFocus: false,
+      // 新增高级搜索
+      particleSizeList: [],
+      ageGroupList: [],
+      canineTypeList: [],
+      formulaList: [],
+      weightList: []
     }
   },
   computed: {
@@ -361,6 +418,7 @@ export default {
     }
   },
   mounted() {
+    this.getUniversalEnum()
     this.infoForm.id = this.$route.query.id || 0
     this.getInfo()
     this.getAllCategory()
@@ -375,6 +433,16 @@ export default {
     this.qiniuZone = api.qiniu
   },
   methods: {
+    async getUniversalEnum() {
+      let res = await getUniversalEnum()
+      if(!res.errno) {
+        this.particleSizeList = res.data.particleSizeList || []
+        this.ageGroupList = res.data.ageGroupList || []
+        this.canineTypeList = res.data.canineTypeList || []
+        this.formulaList = res.data.formulaList || []
+        this.weightList = res.data.weightList
+      }
+    },
     handleSuccess() {
       console.log(11)
     },
@@ -680,7 +748,8 @@ export default {
             info: this.infoForm,
             specData: this.specData,
             specValue: this.specValue,
-            cateId: this.cateId
+            cateId: this.cateId,
+            goodsEnum: this.goodsEnum
           })
           if(!res.errno) {
             this.$message({
@@ -749,6 +818,7 @@ export default {
         this.infoForm = goodsInfo
         this.kdValue = goodsInfo.freight_template_id
         this.cateId = resInfo.category_id
+        this.goodsEnum = { ...resInfo.goodsEnum }
         this.getImgUrl()
       }
     },
