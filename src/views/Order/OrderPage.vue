@@ -967,7 +967,6 @@ export default {
         order_id: this.order_id
       })
       if (!res.errno) {
-        debugger
         this.getList()
         this.printMiandan = false
         this.dialogFormVisible = false

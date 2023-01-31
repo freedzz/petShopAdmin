@@ -1,5 +1,6 @@
 // const rootUrl = 'https://www.hiolabs.com:8360/admin/'
 const rootUrl = 'http://127.0.0.1:8360/admin/'
+// const rootUrl = 'https://www.freedzz.com/admin/'
 
 const api = {
   rootUrl: rootUrl,

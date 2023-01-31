@@ -55,6 +55,18 @@
           <div v-if="!dataInfo.cartSum" class="num">0件</div>
           <div v-else class="num">{{ dataInfo.cartSum }}件</div>
         </div>
+        <div class="block">
+          <div class="text">VIP到期时间:</div>
+          <div class="num">{{ dataInfo.vipEndTime }}</div>
+        </div>
+        <div class="block">
+          <div class="text">账户余额:</div>
+          <div class="num">{{ dataInfo.walletBalance }}元</div>
+        </div>
+        <div class="block">
+          <div class="text">账户积分:</div>
+          <div class="num">{{ dataInfo.userPoints }}元</div>
+        </div>
       </div>
       <el-tabs v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="订单" name="first"></el-tab-pane>
@@ -90,7 +102,7 @@
               <div class="user-address">{{ item.full_region }}{{ item.address }}</div>
               <div class="user-post">{{ item.postscript }}</div>
             </div>
-            <div class="right"><el-button class="right-detail" type="text" size="mini" @click="viewDetail(item.order_sn)">查看详情</el-button></div>
+            <div class="right"><el-button class="right-detail" type="text" size="mini" @click="viewDetail(item.id)">查看详情</el-button></div>
           </div>
         </div>
       </div>
@@ -247,8 +259,8 @@ export default {
 
       this.dialogAddressVisible = true
     },
-    viewDetail(index) {
-      this.$router.push({ name: 'order_detail', query: { order_sn: index } })
+    viewDetail(id) {
+      this.$router.push({ name: 'order_detail', query: { id: id } })
     },
     handleClick(tab) {
       const pindex = tab._data.index
@@ -640,8 +652,13 @@ export default {
 
 .block-box {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  justify-content: flex-start;
   margin-bottom: 20px;
+}
+.block-box::after{
+  content: '';
+  flex: 1 1 auto;
 }
 
 .block-box .block {
@@ -654,6 +671,8 @@ export default {
   width: 24%;
   box-sizing: border-box;
   box-shadow: 1px 4px 4px #f1f1f1;
+  margin-bottom: 10px;
+  margin-right: 10px;
 }
 
 .block-box .a-block {

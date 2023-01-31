@@ -3,7 +3,7 @@
     <div class="login-box">
       <div class="logo"><img src="@/assets/img/loading2.gif"></div>
       <div class="body">
-        <p class="tips">海风小店</p>
+        <p class="tips">壹品佳宠后台管理</p>
         <el-form ref="form" :model="form" :rules="rules" labelPosition="top">
           <el-form-item label="" prop="username"><el-input v-model="form.username" placeholder="用户名"></el-input></el-form-item>
           <el-form-item label="" prop="password"><el-input v-model="form.password" type="password" placeholder="密码"></el-input></el-form-item>

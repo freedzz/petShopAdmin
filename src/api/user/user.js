@@ -65,7 +65,7 @@ export function getUserInfo (data) {
 export function getUserOrder (data) {
   return request({
     method: 'get',
-    url: '/user/info',
+    url: '/user/order',
     data
   })
 }
