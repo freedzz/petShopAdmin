@@ -633,6 +633,7 @@ export default {
       if (res.errno === 0) {
         this.dialogFormVisible = false
         this.dialogExpressVisible = false
+        this.$message.success('保存成功!')
         this.getList()
       }
     },
